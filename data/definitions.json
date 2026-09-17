@@ -1,33 +1,287 @@
 {
-  "source": {
-    "label": "Insee — Classification des fonctions des administrations publiques (COFOG)",
-    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064",
-    "note": "Résumés rédigés d'après la nomenclature COFOG. Le texte de référence est celui de l'Insee, accessible par le lien ci-dessus."
-  },
-  "racine": "La COFOG classe chaque euro dépensé selon sa finalité, et non selon l'administration qui l'a versé. Une retraite payée par la Sécurité sociale et une aide sociale versée par un département relèvent ainsi de la même fonction.",
-  "postes": {
-    "GF01": "Le fonctionnement des institutions : exécutif, législatif, affaires étrangères et aide au développement, recherche fondamentale. Par convention, la charge de la dette y figure aussi lorsque l'emprunt ne peut être rattaché à une finalité précise.",
-    "GF02": "La défense militaire et civile : forces armées, équipements, aide militaire extérieure et recherche liée à la défense.",
-    "GF03": "La police, la gendarmerie, les services d'incendie et de secours, la justice et l'administration pénitentiaire.",
-    "GF04": "Le soutien à l'activité économique : transports, agriculture, énergie, industrie, communications, politiques de l'emploi et tutelle générale de l'économie. C'est ici qu'ont été comptés les boucliers tarifaires sur l'énergie.",
-    "GF05": "La gestion des déchets et des eaux usées, la lutte contre les pollutions, la protection de la biodiversité et des paysages.",
-    "GF06": "Les aides au logement, l'urbanisme et le développement collectif, l'alimentation en eau, l'éclairage public.",
-    "GF07": "La prise en charge des soins : consultations, hospitalisation, médicaments et dispositifs médicaux, ainsi que les services de santé publique. Les revenus versés pendant un arrêt maladie relèvent, eux, de la protection sociale.",
-    "GF08": "Le sport et les loisirs, la culture et le patrimoine, l'audiovisuel public, et les services liés aux cultes.",
-    "GF09": "L'enseignement du préscolaire au supérieur, la formation continue, ainsi que les services annexes comme les cantines, les transports scolaires et les bourses.",
-    "GF10": "Les transferts destinés à compenser une perte de revenu ou une charge : vieillesse, maladie et invalidité, famille, chômage, logement, exclusion sociale. C'est le premier poste de dépense publique du pays.",
-    "GF0107": "Les intérêts versés aux créanciers de l'État et des autres administrations. Cette ligne ne rembourse pas le capital emprunté : elle n'en paie que le loyer.",
-    "GF0104": "La recherche fondamentale, c'est-à-dire celle qui n'est pas rattachée à une application déterminée. La recherche appliquée est comptée dans la fonction qu'elle sert.",
-    "GF1001": "Les prestations versées en cas de maladie ou d'invalidité — indemnités journalières, pensions d'invalidité — distinctes du remboursement des soins, qui relève de la santé.",
-    "GF1002": "Les pensions de retraite versées aux anciens actifs, tous régimes confondus.",
-    "GF1003": "Les pensions de réversion versées au conjoint survivant après le décès d'un assuré.",
-    "GF1004": "Les prestations familiales : allocations familiales, aides à la garde d'enfants, congés parentaux.",
-    "GF1005": "L'indemnisation du chômage et les dispositifs d'accompagnement du retour à l'emploi.",
-    "GF1007": "Les minima sociaux et l'aide aux personnes en difficulté, dont le revenu de solidarité active.",
-    "GF0703": "Les soins dispensés en établissement hospitalier, public comme privé.",
-    "GF0702": "Les soins de ville : consultations de médecins, de dentistes, d'auxiliaires médicaux.",
-    "GF0701": "Les médicaments, appareillages et dispositifs médicaux remboursés.",
-    "GF0904": "L'enseignement supérieur : universités, grandes écoles, et la recherche qui y est rattachée.",
-    "GF0409": "Les transports : routes, ferroviaire, transports urbains, aérien et maritime — infrastructures comme subventions d'exploitation."
-  }
+ "source": {
+  "label": "Insee — Classification des fonctions des administrations publiques (COFOG)",
+  "url": "https://www.insee.fr/fr/metadonnees/definition/c1064",
+  "note": "Résumés rédigés d'après la nomenclature COFOG. Les liens ci-dessous renvoient aux définitions et publications de l'Insee."
+ },
+ "racine": "La COFOG classe chaque euro dépensé selon sa finalité, et non selon l'administration qui l'a versé. Une retraite payée par la Sécurité sociale et une aide sociale versée par un département relèvent ainsi de la même fonction.",
+ "postes": {
+  "GF01": "Le fonctionnement des institutions : exécutif, législatif, affaires étrangères et aide au développement, recherche fondamentale. Par convention, la charge de la dette y figure aussi lorsque l'emprunt ne peut être rattaché à une finalité précise.",
+  "GF02": "La défense militaire et civile : forces armées, équipements, aide militaire extérieure et recherche liée à la défense.",
+  "GF03": "La police, la gendarmerie, les services d'incendie et de secours, la justice et l'administration pénitentiaire.",
+  "GF04": "Le soutien à l'activité économique : transports, agriculture, énergie, industrie, communications, politiques de l'emploi et tutelle générale de l'économie. C'est ici qu'ont été comptés les boucliers tarifaires sur l'énergie.",
+  "GF05": "La gestion des déchets et des eaux usées, la lutte contre les pollutions, la protection de la biodiversité et des paysages.",
+  "GF06": "Les aides au logement, l'urbanisme et le développement collectif, l'alimentation en eau, l'éclairage public.",
+  "GF07": "La prise en charge des soins : consultations, hospitalisation, médicaments et dispositifs médicaux, ainsi que les services de santé publique. Les revenus versés pendant un arrêt maladie relèvent, eux, de la protection sociale.",
+  "GF08": "Le sport et les loisirs, la culture et le patrimoine, l'audiovisuel public, et les services liés aux cultes.",
+  "GF09": "L'enseignement du préscolaire au supérieur, la formation continue, ainsi que les services annexes comme les cantines, les transports scolaires et les bourses.",
+  "GF10": "Les transferts destinés à compenser une perte de revenu ou une charge : vieillesse, maladie et invalidité, famille, chômage, logement, exclusion sociale. C'est le premier poste de dépense publique du pays.",
+  "GF0107": "Les intérêts versés aux créanciers de l'État et des autres administrations. Cette ligne ne rembourse pas le capital emprunté : elle n'en paie que le loyer.",
+  "GF0104": "La recherche fondamentale, c'est-à-dire celle qui n'est pas rattachée à une application déterminée. La recherche appliquée est comptée dans la fonction qu'elle sert.",
+  "GF1001": "Les prestations versées en cas de maladie ou d'invalidité — indemnités journalières, pensions d'invalidité — distinctes du remboursement des soins, qui relève de la santé.",
+  "GF1002": "Les pensions de retraite versées aux anciens actifs, tous régimes confondus.",
+  "GF1003": "Les pensions de réversion versées au conjoint survivant après le décès d'un assuré.",
+  "GF1004": "Les prestations familiales : allocations familiales, aides à la garde d'enfants, congés parentaux.",
+  "GF1005": "L'indemnisation du chômage et les dispositifs d'accompagnement du retour à l'emploi.",
+  "GF1007": "Les minima sociaux et l'aide aux personnes en difficulté, dont le revenu de solidarité active.",
+  "GF0703": "Les soins dispensés en établissement hospitalier, public comme privé.",
+  "GF0702": "Les soins de ville : consultations de médecins, de dentistes, d'auxiliaires médicaux.",
+  "GF0701": "Les médicaments, appareillages et dispositifs médicaux remboursés.",
+  "GF0904": "L'enseignement supérieur : universités, grandes écoles, et la recherche qui y est rattachée.",
+  "GF0409": "Les transports : routes, ferroviaire, transports urbains, aérien et maritime — infrastructures comme subventions d'exploitation."
+ },
+ "liens": {
+  "racine": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   },
+   {
+    "label": "Tableaux par fonction (comptes de la Nation)",
+    "url": "https://www.insee.fr/fr/statistiques/8574707"
+   }
+  ],
+  "GF01": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Dette au sens de Maastricht",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1091"
+   },
+   {
+    "label": "Dette nette",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2189"
+   }
+  ],
+  "GF02": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF03": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF04": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF05": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF06": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF07": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF08": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF09": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF10": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF0107": [
+   {
+    "label": "Dette au sens de Maastricht",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1091"
+   },
+   {
+    "label": "Dette nette",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2189"
+   }
+  ],
+  "GF0104": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   }
+  ],
+  "GF1001": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF1002": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF1003": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF1004": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF1005": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF1007": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Prestations en espèces",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2295"
+   }
+  ],
+  "GF0703": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0702": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0701": [
+   {
+    "label": "Prestations sociales",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c2000"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0904": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0409": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ]
+ }
 }

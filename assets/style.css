@@ -64,7 +64,10 @@ body {
 header, footer { flex: none; }
 main { flex: 1 0 auto; padding-bottom: clamp(3rem, 7vw, 4.5rem); }
 
-.wrap { width: min(100% - 2.5rem, 60rem); margin-inline: auto; }
+/* Le conteneur s'élargit sur grand écran, mais les blocs de texte gardent
+   leur largeur en caractères : une ligne de 200 signes est illisible. */
+.wrap { width: min(100% - 2.5rem, 78rem); margin-inline: auto; }
+@media (min-width: 1200px) { .wrap { width: min(100% - 4rem, 78rem); } }
 
 h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.15; margin: 0; letter-spacing: -.01em; }
 a { color: inherit; text-underline-offset: .18em; text-decoration-color: var(--rule); }
@@ -74,7 +77,7 @@ a:hover { text-decoration-color: currentColor; }
 
 header { padding: clamp(2.5rem, 7vw, 4.5rem) 0 0; }
 h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
-.sub { font-size: .875rem; color: var(--ink-3); max-width: 68ch; margin: .9rem 0 0;
+.sub { font-size: .9375rem; color: var(--ink-3); max-width: 78ch; margin: .9rem 0 0;
   font-variant-numeric: tabular-nums; }
 
 /* ---------- camembert ---------- */
@@ -116,10 +119,15 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 
 .pie-layout { display: grid; gap: clamp(1.5rem, 4vw, 2.5rem); align-items: center;
   grid-template-columns: minmax(0, 1fr); }
-@media (min-width: 780px) { .pie-layout { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); } }
+@media (min-width: 780px)  { .pie-layout { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); } }
+@media (min-width: 1100px) { .pie-layout { grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  gap: clamp(2.5rem, 5vw, 4rem); } }
 
 .pie { position: relative; }
-.pie svg { display: block; width: 100%; height: auto; max-width: 22rem; margin-inline: auto; }
+/* clamp plutôt qu'une largeur fixe : le camembert profite des grands écrans
+   sans devenir démesuré. */
+.pie svg { display: block; width: 100%; height: auto;
+  max-width: clamp(18rem, 26vw, 26rem); margin-inline: auto; }
 .pie path { cursor: pointer; transition: opacity .12s; }
 .pie path.dim { opacity: .28; }
 .pie .center-v { font-family: var(--serif); font-size: 22px; fill: var(--ink); text-anchor: middle; }
@@ -137,6 +145,11 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 .keys button:hover, .keys button.on { background: var(--hover); }
 .keys i { width: .7rem; height: .7rem; border-radius: 2px; align-self: center; }
 .keys .name { font-size: .875rem; }
+@media (min-width: 1100px) {
+  .keys button { padding: .7rem .35rem; }
+  .keys .name { font-size: .9375rem; }
+  .keys .md, .keys .pc { font-size: .875rem; }
+}
 .keys .emo { display: inline-block; width: 1.5em; font-size: .9375rem;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
 .keys .md, .keys .pc { font-size: .8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -180,6 +193,9 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 .def[open] > summary::before { transform: rotate(90deg); }
 .def > summary:hover { color: var(--ink); }
 .def p { margin: .5rem 0 0; color: var(--ink-2); max-width: 66ch; }
+.def .liens { display: flex; flex-wrap: wrap; gap: .3rem .6rem; }
+.def .liens a { color: var(--ink-2); }
+.def .liens a:hover { color: var(--ink); }
 .def .src { color: var(--ink-3); font-size: .9em; }
 
 /* ---------- page article ---------- */

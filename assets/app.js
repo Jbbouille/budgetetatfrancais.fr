@@ -189,9 +189,11 @@
     if (!DEFS) return '';
     const texte = code ? DEFS.postes[code] : DEFS.racine;
     if (!texte) return '';
+    const liens = (DEFS.liens[code || 'racine'] || [DEFS.source])
+      .map((l) => `<a href="${l.url}">${l.label}</a>`).join(' · ');
     return `<details class="def"><summary>Que recouvre ce poste&nbsp;?</summary>` +
-      `<p>${texte}</p><p class="src">Nomenclature de référence&nbsp;: ` +
-      `<a href="${DEFS.source.url}">${DEFS.source.label}</a>. ${DEFS.source.note}</p></details>`;
+      `<p>${texte}</p><p class="liens">${liens}</p>` +
+      `<p class="src">${DEFS.source.note}</p></details>`;
   }
 
   /* Montre la cellule exacte du classeur Insee d'où sort le chiffre affiché.

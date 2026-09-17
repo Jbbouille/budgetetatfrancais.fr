@@ -11,6 +11,7 @@ on:
       - debat.html
       - recettes.html
       - data/meta.json
+      - data/definitions.json
       - scripts/check_links.py
       - .github/workflows/liens.yml
   pull_request:

@@ -39,7 +39,15 @@ def collect():
         for t in src.get("tableaux", []):
             urls.setdefault(t["url"], f"meta:{key}.{t['id']}")
 
-    # 2. les liens reellement affiches sur les pages
+    # 2. les liens des definitions de postes
+    defs = json.loads((ROOT / "data" / "definitions.json").read_text(encoding="utf-8"))
+    for poste, entrees in defs.get("liens", {}).items():
+        for l in entrees:
+            urls.setdefault(l["url"], f"definitions:{poste}")
+    if defs.get("source", {}).get("url"):
+        urls.setdefault(defs["source"]["url"], "definitions:source")
+
+    # 3. les liens reellement affiches sur les pages
     for page in ("index.html", "debat.html", "recettes.html"):
         html = (ROOT / page).read_text(encoding="utf-8")
         for url in re.findall(r"""https://[^"'<> )]+""", html):

@@ -143,6 +143,19 @@
        - `niveau` : la part est OUVERTE, le camembert montre ses composantes.
      Sans cette distinction, #poste=GF03 ouvrait la fonction au lieu de la
      désigner, et rien n'était surligné. */
+  /* Reconstruit le chemin réel, étape par étape depuis la racine. À chaque
+     niveau, si le code visé n'est pas dessiné (il est replié dans « Autres postes »),
+     on ouvre d'abord ce repli : le fil d'Ariane doit montrer le même trajet que
+     celui qu'on suivrait à la souris. */
+  function ouvrirRepli(code) {
+    const parts = slices().parts;
+    if (parts.some((d) => d.code === code)) return;
+    const repli = parts.find((d) => d.rest && d.rest.includes(code));
+    if (repli) {
+      stack.push({ kind: 'rest', codes: repli.rest, label: 'Autres postes', code: null });
+    }
+  }
+
   function lireURL() {
     const q = new URLSearchParams(location.hash.slice(1));
     const annee = parseInt(q.get('annee'), 10);
@@ -159,25 +172,15 @@
     if (!cible || !DATA.postes[cible]) return;
 
     for (const a of ancetres(cible)) {
-      if (DATA.postes[a]) stack.push({ kind: 'fn', code: a, label: court(DATA.postes[a].label) });
+      if (!DATA.postes[a]) continue;
+      ouvrirRepli(a);
+      stack.push({ kind: 'fn', code: a, label: court(DATA.postes[a].label) });
     }
 
-    if (!poste) {
-      // niveau seul : on ouvre la fonction
-      stack.push({ kind: 'fn', code: niveau, label: court(DATA.postes[niveau].label) });
-      return;
-    }
-
-    cellule = poste;
-    // Un poste replié dans « Autres » n'est pas dessiné : on ouvre ce repli,
-    // sinon l'encart décrirait une part absente du camembert.
-    const parts = slices().parts;
-    if (!parts.some((d) => d.code === poste)) {
-      const repli = parts.find((d) => d.rest && d.rest.includes(poste));
-      if (repli) {
-        stack.push({ kind: 'rest', codes: repli.rest, label: 'Autres postes', code: null });
-      }
-    }
+    ouvrirRepli(cible);
+    if (poste) cellule = poste;                 // la part est sélectionnée
+    else stack.push({ kind: 'fn', code: niveau, // la fonction est ouverte
+                      label: court(DATA.postes[niveau].label) });
   }
 
   function ecrireURL() {

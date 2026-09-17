@@ -142,6 +142,14 @@ nouveau millésime, qui vit à une autre adresse — voir la section suivante.
    `ratios`, et une entrée `cnAAAA` dans `sources`).
 4. Relancer `check_links.py`.
 
+## Cache du navigateur
+
+Les pages chargent `assets/*.js?v=N` et `assets/style.css?v=N`. Après une
+modification de ces fichiers, **incrémenter le `v=`** dans les trois pages,
+sinon les navigateurs (et le serveur intégré de l'IDE) continuent de servir
+l'ancienne version. C'est la cause la plus fréquente d'un « ça ne marche pas »
+alors que le code est correct.
+
 ## Développement local
 
 ```bash

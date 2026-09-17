@@ -154,6 +154,12 @@
     return out;
   };
 
+  /* Deux paramètres, parce qu'il y a deux états distincts :
+       - `poste` : la part est SÉLECTIONNÉE dans le camembert de son parent,
+         mise en avant, avec son encart — c'est ce qu'on attend d'un lien ;
+       - `niveau` : la part est OUVERTE, le camembert montre ses composantes.
+     Sans cette distinction, #poste=GF03 ouvrait la fonction au lieu de la
+     désigner, et rien n'était surligné. */
   function lireURL() {
     const q = new URLSearchParams(location.hash.slice(1));
     const annee = parseInt(q.get('annee'), 10);
@@ -161,24 +167,41 @@
       const i = DATA.years.indexOf(annee);
       if (i >= 0) yi = i;
     }
-    const code = q.get('poste');
     stack = []; cellule = null;
-    if (!code || !DATA.apu[code]) return;
-    for (const a of ancetres(code)) {
+    readColors();
+
+    const niveau = q.get('niveau');
+    const poste = q.get('poste');
+    const cible = poste || niveau;
+    if (!cible || !DATA.apu[cible]) return;
+
+    for (const a of ancetres(cible)) {
       if (DATA.apu[a]) stack.push({ kind: 'fn', code: a, label: shortLabel(DATA.apu[a].label) });
     }
-    if (hasChildren(code)) {
-      stack.push({ kind: 'fn', code, label: shortLabel(DATA.apu[code].label) });
-    } else {
-      cellule = code;
+
+    if (!poste) {
+      // niveau seul : on ouvre la fonction
+      stack.push({ kind: 'fn', code: niveau, label: shortLabel(DATA.apu[niveau].label) });
+      return;
+    }
+
+    cellule = poste;
+    // Un poste replié dans « Autres » n'est pas dessiné : on ouvre ce repli,
+    // sinon l'encart décrirait une part absente du camembert.
+    const parts = slices();
+    if (!parts.some((d) => d.code === poste)) {
+      const repli = parts.find((d) => d.rest && d.rest.includes(poste));
+      if (repli) {
+        stack.push({ kind: 'rest', codes: repli.rest, label: 'Autres fonctions', code: null });
+      }
     }
   }
 
   function ecrireURL() {
     const node = last(stack);
-    const code = cellule || (node && node.kind === 'fn' ? node.code : null);
     const q = new URLSearchParams();
-    if (code) q.set('poste', code);
+    if (cellule) q.set('poste', cellule);
+    else if (node && node.kind === 'fn') q.set('niveau', node.code);
     if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
     const hash = q.toString();
     const url = location.pathname + location.search + (hash ? '#' + hash : '');

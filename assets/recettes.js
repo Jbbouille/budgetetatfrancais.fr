@@ -124,6 +124,47 @@
     return val(node.code);
   };
 
+
+  /* ---------- état dans l'URL ---------- */
+
+  /* Même principe que sur la page des dépenses : #poste=g11&annee=2015. Les
+     postes des recettes portent un parent explicite, la chaîne se remonte donc
+     de proche en proche plutôt que par la longueur du code. */
+  function ancetres(code) {
+    const out = [];
+    let p = P(code)?.parent;
+    while (p) { out.unshift(p); p = P(p)?.parent; }
+    return out;
+  }
+
+  function lireURL() {
+    const q = new URLSearchParams(location.hash.slice(1));
+    const annee = parseInt(q.get('annee'), 10);
+    if (annee) {
+      const i = DATA.years.indexOf(annee);
+      if (i >= 0) yi = i;
+    }
+    const code = q.get('poste');
+    stack = []; cellule = null;
+    if (!code || !DATA.postes[code]) return;
+    for (const a of ancetres(code)) stack.push({ kind: 'fn', code: a, label: court(P(a).label) });
+    if (ouvrable(code)) stack.push({ kind: 'fn', code, label: court(P(code).label) });
+    else cellule = code;
+  }
+
+  function ecrireURL() {
+    const node = last(stack);
+    const code = cellule || (node && node.kind === 'fn' ? node.code : null);
+    const q = new URLSearchParams();
+    if (code) q.set('poste', code);
+    if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
+    const hash = q.toString();
+    const url = location.pathname + location.search + (hash ? '#' + hash : '');
+    if (url !== location.pathname + location.search + location.hash) {
+      history.replaceState(null, '', url);
+    }
+  }
+
   let PARTS = [];
 
   function draw() {
@@ -136,6 +177,7 @@
     drawCrumb();
     drawCellule();
     repaint();
+    ecrireURL();
   }
 
   function drawYear() {
@@ -355,10 +397,12 @@
     .then((d) => {
       DATA = d;
       setupYears();
+      lireURL();
       $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       draw();
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+      addEventListener('hashchange', () => { lireURL(); hovered = null; draw(); });
     })
     .catch((err) => {
       console.error(err);

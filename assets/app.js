@@ -141,6 +141,52 @@
 
   /* ---------- rendu ---------- */
 
+
+  /* ---------- état dans l'URL ---------- */
+
+  /* Le hash porte le poste ouvert et l'année : #poste=GF1002&annee=2015. On y
+     écrit avec replaceState pour ne pas remplir l'historique à chaque survol de
+     curseur — le bouton « précédent » ramène donc à la page d'avant, pas à la
+     part précédente. */
+  const ancetres = (code) => {
+    const out = [];
+    for (let n = 4; n < code.length; n += 2) out.push(code.slice(0, n));
+    return out;
+  };
+
+  function lireURL() {
+    const q = new URLSearchParams(location.hash.slice(1));
+    const annee = parseInt(q.get('annee'), 10);
+    if (annee) {
+      const i = DATA.years.indexOf(annee);
+      if (i >= 0) yi = i;
+    }
+    const code = q.get('poste');
+    stack = []; cellule = null;
+    if (!code || !DATA.apu[code]) return;
+    for (const a of ancetres(code)) {
+      if (DATA.apu[a]) stack.push({ kind: 'fn', code: a, label: shortLabel(DATA.apu[a].label) });
+    }
+    if (hasChildren(code)) {
+      stack.push({ kind: 'fn', code, label: shortLabel(DATA.apu[code].label) });
+    } else {
+      cellule = code;
+    }
+  }
+
+  function ecrireURL() {
+    const node = last(stack);
+    const code = cellule || (node && node.kind === 'fn' ? node.code : null);
+    const q = new URLSearchParams();
+    if (code) q.set('poste', code);
+    if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
+    const hash = q.toString();
+    const url = location.pathname + location.search + (hash ? '#' + hash : '');
+    if (url !== location.pathname + location.search + location.hash) {
+      history.replaceState(null, '', url);
+    }
+  }
+
   let PARTS = [];
 
   function draw() {
@@ -153,6 +199,7 @@
     drawCrumb();
     drawCellule();
     repaint();
+    ecrireURL();
   }
 
   /* ---------- sélecteur d'année ---------- */
@@ -390,10 +437,12 @@
     .then(([d, defs]) => {
       DATA = d; DEFS = defs;
       setupYears();
+      lireURL();
       $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       draw();
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+      addEventListener('hashchange', () => { lireURL(); hovered = null; draw(); });
     })
     .catch((err) => {
       console.error(err);

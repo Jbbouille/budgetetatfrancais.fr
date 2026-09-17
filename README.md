@@ -15,6 +15,11 @@ affichées en lecture seule sous forme de feuilles de calcul.
   L'ordre des parts et leurs couleurs sont figés sur l'année de référence (la
   plus récente), jamais sur le classement de l'année affichée : une couleur
   désigne donc toujours la même fonction quand on déplace le curseur.
+- **L'état est dans l'URL** : le poste ouvert et l'année vivent dans le hash,
+  `#poste=GF1002&annee=2010`. Un lien mène donc directement au bon niveau, et
+  l'adresse se met à jour au fil de la navigation. L'écriture passe par
+  `replaceState` : le bouton « précédent » ramène à la page d'avant, pas à la
+  part précédente.
 - **Un emoji par poste** : les sous-fonctions héritent de l'emoji de leur
   fonction parente, sauf exceptions listées dans `EMOJI` (app.js).
 - **La cellule d'origine** : cliquer sur un poste qui n'a plus de sous-niveau

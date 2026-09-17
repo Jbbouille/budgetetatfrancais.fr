@@ -1,0 +1,180 @@
+/* budgetetatfrancais.fr — sobre, fond blanc, sans dépendance externe. */
+
+:root {
+  color-scheme: light;
+
+  --bg:     #ffffff;
+  --rule:   #d8d8d4;
+  --rule-2: #ebebe8;
+
+  --ink:     #14140f;
+  --ink-2:   #4a4a45;
+  --ink-3:   #7d7d76;
+
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --s6: #008300;
+
+  --grid-line: #d4d4d0;
+  --grid-head: #f2f2ef;
+  --grid-sel:  #e8f0fb;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg:     #121211;
+    --rule:   #383833;
+    --rule-2: #262624;
+    --ink:    #f4f4ef;
+    --ink-2:  #b9b8b0;
+    --ink-3:  #8b8a83;
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --s4: #c98500;
+    --s5: #d55181;
+    --s6: #008300;
+    --grid-line: #35352f;
+    --grid-head: #1c1c1a;
+    --grid-sel:  #1b2b41;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+.wrap { width: min(100% - 2.5rem, 60rem); margin-inline: auto; }
+
+h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.15; margin: 0; letter-spacing: -.01em; }
+a { color: inherit; text-underline-offset: .18em; text-decoration-color: var(--rule); }
+a:hover { text-decoration-color: currentColor; }
+
+/* ---------- en-tête ---------- */
+
+header { padding: clamp(2.5rem, 7vw, 4.5rem) 0 0; }
+h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
+.lede { font-size: clamp(1rem, 2.2vw, 1.125rem); color: var(--ink-2); max-width: 60ch; margin: 1.125rem 0 0; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.note { font-size: .875rem; color: var(--ink-3); max-width: 62ch; margin: .9rem 0 0; }
+
+/* ---------- camembert ---------- */
+
+.pie-block { margin-top: clamp(2rem, 5vw, 3.25rem); }
+
+.crumb { font-size: .8125rem; color: var(--ink-3); margin-bottom: 1rem; min-height: 1.5rem; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.crumb button {
+  font: inherit; font-size: .8125rem; background: none; border: 0; padding: 0;
+  color: var(--ink-2); cursor: pointer; text-decoration: underline; text-underline-offset: .18em;
+  text-decoration-color: var(--rule);
+}
+.crumb button:hover { color: var(--ink); text-decoration-color: currentColor; }
+.crumb .sep { color: var(--rule); }
+.crumb .here { color: var(--ink); }
+
+.pie-layout { display: grid; gap: clamp(1.5rem, 4vw, 2.5rem); align-items: center;
+  grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 780px) { .pie-layout { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); } }
+
+.pie { position: relative; }
+.pie svg { display: block; width: 100%; height: auto; max-width: 22rem; margin-inline: auto; }
+.pie path { cursor: pointer; transition: opacity .12s; }
+.pie path.dim { opacity: .28; }
+.pie .center-v { font-family: var(--serif); font-size: 22px; fill: var(--ink); text-anchor: middle; }
+.pie .center-k { font-size: 11px; fill: var(--ink-3); text-anchor: middle; letter-spacing: .04em; text-transform: uppercase; }
+
+/* légende = étiquettes directes (identité jamais portée par la couleur seule) */
+.keys { list-style: none; margin: 0; padding: 0; }
+.keys li { border-bottom: 1px solid var(--rule-2); }
+.keys li:first-child { border-top: 1px solid var(--rule-2); }
+.keys button {
+  font: inherit; width: 100%; background: none; border: 0; cursor: pointer; text-align: left;
+  display: grid; grid-template-columns: .7rem 1fr auto auto; align-items: baseline;
+  gap: .3rem .7rem; padding: .55rem .25rem; color: var(--ink);
+}
+.keys button:hover, .keys button.on { background: var(--grid-sel); }
+.keys i { width: .7rem; height: .7rem; border-radius: 2px; align-self: center; }
+.keys .name { font-size: .875rem; }
+.keys .md, .keys .pc { font-size: .8125rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.keys .md { color: var(--ink); font-weight: 600; }
+.keys .pc { color: var(--ink-3); min-width: 3.4rem; text-align: right; }
+.keys .leaf { color: var(--ink-3); font-size: .8125rem; }
+
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 5; opacity: 0; transition: opacity .1s;
+  background: var(--bg); border: 1px solid var(--ink-3); padding: .55rem .7rem;
+  font-size: .8125rem; min-width: 10rem; max-width: 16rem;
+}
+.tooltip.on { opacity: 1; }
+.tooltip strong { display: block; margin-bottom: .25rem; }
+.tooltip .r { display: flex; justify-content: space-between; gap: 1rem; color: var(--ink-2); }
+.tooltip .r b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.caption { font-size: .8125rem; color: var(--ink-2); margin: 1.75rem 0 0; max-width: 70ch;
+  padding-top: 1rem; border-top: 1px solid var(--rule-2); }
+.caption p { margin: 0 0 .35rem; }
+.caption p:last-child { margin-bottom: 0; }
+.caption b { color: var(--ink); font-weight: 600; }
+
+/* ---------- feuille de calcul ---------- */
+
+.sheet-block { margin-top: clamp(3rem, 7vw, 4.5rem); padding-top: clamp(2rem, 5vw, 3rem); border-top: 1px solid var(--rule); }
+.sheet-block h2 { font-size: clamp(1.25rem, 3vw, 1.625rem); }
+.sheet-block > p { color: var(--ink-2); max-width: 62ch; font-size: .9375rem; }
+
+/* Onglets de feuille : ils défilent horizontalement plutôt que de déborder,
+   comme dans un tableur. */
+.tabs { display: flex; gap: 0; margin-top: 1.75rem; overflow-x: auto; scrollbar-width: thin; }
+.tabs button {
+  font: inherit; font-size: .8125rem; padding: .4rem .9rem; cursor: pointer;
+  background: var(--grid-head); color: var(--ink-2); flex: none; white-space: nowrap;
+  border: 1px solid var(--grid-line); border-bottom: 0; margin-right: -1px;
+}
+.tabs button[aria-selected="true"] { background: var(--bg); color: var(--ink); font-weight: 600; position: relative; z-index: 1; }
+.tabs button:hover { color: var(--ink); }
+
+.sheet { overflow-x: auto; border: 1px solid var(--grid-line); background: var(--bg); }
+.sheet table { border-collapse: collapse; font-size: .8125rem; font-family: var(--sans); min-width: 100%; }
+.sheet th, .sheet td {
+  border-right: 1px solid var(--grid-line); border-bottom: 1px solid var(--grid-line);
+  padding: .3rem .55rem; text-align: left; white-space: nowrap; vertical-align: top;
+}
+.sheet thead th { background: var(--grid-head); color: var(--ink-3); font-weight: 500;
+  font-family: var(--mono); font-size: .6875rem; text-align: center; position: sticky; top: 0; }
+.sheet tbody th {
+  background: var(--grid-head); color: var(--ink-3); font-weight: 400;
+  font-family: var(--mono); font-size: .6875rem; text-align: center;
+  position: sticky; left: 0; z-index: 1; min-width: 2.2rem;
+}
+.sheet tbody tr:hover td { background: var(--grid-sel); }
+.sheet td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.sheet td.hd { font-weight: 600; color: var(--ink); background: var(--grid-head); }
+.sheet td.wrap-cell { white-space: normal; min-width: 18rem; }
+.sheet td a { font-size: .8125rem; }
+.sheet td .sw { width: .6rem; height: .6rem; border-radius: 2px; display: inline-block; margin-right: .4rem; vertical-align: -1px; }
+.sheet-foot { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; justify-content: space-between;
+  font-size: .75rem; color: var(--ink-3); padding: .4rem .2rem 0; }
+
+/* ---------- pied ---------- */
+
+footer { margin-top: clamp(3rem, 7vw, 4.5rem); padding: 2rem 0 4rem; border-top: 1px solid var(--rule); }
+footer p { font-size: .8125rem; color: var(--ink-3); max-width: 70ch; margin: 0 0 .6rem; }
+
+:focus-visible { outline: 2px solid var(--s1); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

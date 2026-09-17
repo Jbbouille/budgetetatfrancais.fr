@@ -196,27 +196,37 @@
       `<p class="src">${DEFS.source.note}</p></details>`;
   }
 
-  /* Montre la cellule exacte du classeur Insee d'où sort le chiffre affiché.
-     Les coordonnées viennent de build_data.py, qui retient le numéro de ligne
-     de chaque poste au moment de lire le .xlsx. */
+  /* Encart du bas. Il porte, selon le cas :
+       - le poste terminal qu'on vient de cliquer : montant, part, cellule du
+         classeur d'origine, puis sa définition ;
+       - sinon le niveau ouvert : montant, part et définition, sans cellule,
+         puisqu'on n'a pas désigné de chiffre précis.
+     Rien à la racine. */
   function drawCellule() {
     const el = $('#cellule');
-    const node = cellule && DATA.apu[cellule];
-    if (!node || node.r == null) { el.hidden = true; el.innerHTML = ''; return; }
-    const s = DATA.source;
-    const ref = s.colonnes[yi] + node.r;
-    el.hidden = false;
-    const montant = node.v[yi] ?? 0;
+    const node = last(stack);
+    const code = cellule || (node && node.kind === 'fn' ? node.code : null);
+    const p = code && DATA.apu[code];
+    if (!p) { el.hidden = true; el.innerHTML = ''; return; }
+
+    const montant = p.v[yi] ?? 0;
     const partTotale = (montant / val('_Z')) * 100;
+
+    let ou = '';
+    if (cellule && p.r != null) {
+      const s = DATA.source;
+      const ref = s.colonnes[yi] + p.r;
+      ou = `<span class="ou"><a href="${s.url}">${s.fichier}</a> · feuille ` +
+        `<code>${s.feuille}</code> · ligne <code>${p.r}</code> · colonne ` +
+        `<code>${s.colonnes[yi]}</code> · cellule <code>${ref}</code></span>`;
+    }
+
+    el.hidden = false;
     el.innerHTML =
-      `<span class="emo">${emo(cellule)}</span>` +
-      `<b>${node.label}</b> — ${md(montant)} en ${year()}, soit ` +
+      `<span class="emo">${emo(code)}</span>` +
+      `<b>${p.label}</b> — ${md(montant)} en ${year()}, soit ` +
       `<b>${pct(partTotale)}</b> de la dépense publique totale` +
-      `<span class="ou">` +
-      `<a href="${s.url}">${s.fichier}</a> · feuille <code>${s.feuille}</code>` +
-      ` · ligne <code>${node.r}</code> · colonne <code>${s.colonnes[yi]}</code>` +
-      ` · cellule <code>${ref}</code></span>` +
-      definition(cellule);
+      ou + definition(code);
   }
 
   function drawPie(data) {
@@ -360,11 +370,6 @@
     add('Toutes les fonctions', 0, stack.length === 0);
     stack.forEach((n, i) => add(`${emo(n.code)} ${n.label}`, i + 1, i === stack.length - 1));
 
-    // Pas de définition à la racine : « Que recouvre ce poste ? » n'a pas de
-    // sens tant qu'aucun poste n'est ouvert.
-    const node = last(stack);
-    $('#def-niveau').innerHTML =
-      node && node.kind === 'fn' ? definition(node.code) : '';
   }
 
   /* ---------- démarrage ---------- */

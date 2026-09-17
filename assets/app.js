@@ -186,10 +186,10 @@
   /* Depliant : ce que recouvre un poste. Replie par defaut pour ne pas gener
      la lecture, et toujours accompagne du lien vers la definition de reference. */
   function definition(code) {
-    if (!DEFS) return '';
-    const texte = code ? DEFS.postes[code] : DEFS.racine;
+    if (!DEFS || !code) return '';
+    const texte = DEFS.postes[code];
     if (!texte) return '';
-    const liens = (DEFS.liens[code || 'racine'] || [DEFS.source])
+    const liens = (DEFS.liens[code] || [DEFS.source])
       .map((l) => `<a href="${l.url}">${l.label}</a>`).join(' · ');
     return `<details class="def"><summary>Que recouvre ce poste&nbsp;?</summary>` +
       `<p>${texte}</p><p class="liens">${liens}</p>` +

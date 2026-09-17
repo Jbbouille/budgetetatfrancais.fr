@@ -212,7 +212,13 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 
 
 footer { padding: 2rem 0 2.5rem; border-top: 1px solid var(--rule); }
-footer p { font-size: .8125rem; color: var(--ink-3); max-width: 70ch; margin: 0 0 .6rem; }
+
+/* Les blocs du pied se mettent en colonnes dès qu'il y a la place, et
+   s'empilent en dessous. `min(100%, 18rem)` fait basculer en colonne unique
+   sur petit écran sans avoir besoin d'une requête média. */
+footer .wrap { display: grid; gap: 1.25rem 2.5rem; align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+footer p { font-size: .8125rem; color: var(--ink-3); max-width: 62ch; margin: 0; }
 
 :focus-visible { outline: 2px solid var(--s1); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

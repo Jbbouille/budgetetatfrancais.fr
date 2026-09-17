@@ -77,6 +77,13 @@ a:hover { text-decoration-color: currentColor; }
 
 header { padding: clamp(2.5rem, 7vw, 4.5rem) 0 0; }
 h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
+
+/* Les deux pages à camembert réservent la même hauteur d'en-tête : sans cela,
+   un titre sur une ligne au lieu de deux décale le graphique verticalement
+   quand on passe de l'une à l'autre. Les valeurs correspondent à deux lignes,
+   compte tenu des interlignes respectifs (1,15 pour h1, 1,6 pour .sub). */
+.page-graphique h1 { min-height: 2.3em; }
+.page-graphique .sub { min-height: 3.2em; }
 .sub { font-size: .9375rem; color: var(--ink-3); max-width: 78ch; margin: .9rem 0 0;
   font-variant-numeric: tabular-nums; }
 

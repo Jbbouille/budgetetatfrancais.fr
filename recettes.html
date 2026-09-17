@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>D'où vient l'argent — Dépenses publiques françaises</title>
-<meta name="description" content="En cours de construction : la composition des recettes publiques françaises — impôts, cotisations sociales, taxes sur les carburants — à partir des données de l'Insee.">
+<title>D'où vient l'argent — Recettes publiques françaises</title>
+<meta name="description" content="Ce qui finance la dépense publique française, de 1995 à 2024 : cotisations, TVA, TICPE, impôt sur le revenu — et la part empruntée. Données Insee.">
 <link rel="canonical" href="https://budgetetatfrancais.fr/recettes.html">
-<meta name="robots" content="noindex">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:title" content="D'où vient l'argent — en cours de construction">
+<meta property="og:title" content="D'où vient l'argent — Recettes publiques françaises">
+<meta property="og:description" content="Ce qui finance la dépense publique française : cotisations, TVA, TICPE, impôt sur le revenu, et la part empruntée.">
 <meta property="og:url" content="https://budgetetatfrancais.fr/recettes.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%232a78d6'/><path d='M50 50 L50 6 A44 44 0 0 1 93 59 Z' fill='%23eb6834'/></svg>">
 <link rel="stylesheet" href="assets/style.css">
@@ -18,57 +18,67 @@
 
 <header class="wrap">
   <h1>D'où vient l'argent</h1>
-  <p class="sub">🚧 Page en cours de construction</p>
+  <p class="sub" id="sub"></p>
 </header>
 
 <main class="wrap">
-  <article class="texte">
 
-    <p>
-      Le camembert existant montre <a href="index.html">où va l'argent public</a>.
-      Cette page montrera l'autre moitié de l'équation&nbsp;: d'où il vient.
-      Même principe — un camembert cliquable, année par année, chaque chiffre
-      renvoyant à la cellule du fichier Insee dont il sort.
-    </p>
+  <div class="pie-block">
+    <div class="years">
+      <button type="button" id="y-prev" aria-label="Année précédente">⬅️</button>
+      <input type="range" id="y-range" min="0" max="0" step="1" value="0"
+             aria-label="Année affichée" list="y-ticks">
+      <datalist id="y-ticks"></datalist>
+      <button type="button" id="y-next" aria-label="Année suivante">➡️</button>
+      <output id="y-out" for="y-range"></output>
+    </div>
 
-    <h2>Ce qu'elle contiendra</h2>
+    <nav class="crumb" id="crumb" aria-label="Niveau affiché"></nav>
 
-    <p>
-      La décomposition des recettes publiques, qui se répartissent en quelques
-      grandes familles&nbsp;: les cotisations sociales, les impôts sur la
-      production et les importations (dont la TVA et la taxe sur les
-      carburants), les impôts sur le revenu et le patrimoine (impôt sur le
-      revenu, CSG, impôt sur les sociétés), et les recettes non fiscales.
-    </p>
+    <div class="pie-layout">
+      <div class="pie" id="pie"></div>
+      <ul class="keys" id="keys"></ul>
+    </div>
 
-    <p>
-      Chaque famille s'ouvrira sur son détail, comme la protection sociale
-      s'ouvre aujourd'hui sur les retraites, la maladie et la famille.
-    </p>
+    <p class="cellule" id="cellule" hidden></p>
 
-    <h2>Où en est le travail</h2>
+    <div class="caption">
+      <p><b>Champ&nbsp;:</b> ensemble des administrations publiques (S13), France,
+      <span id="champ-annee"></span>. Montants en euros courants.</p>
+      <p><b>Total&nbsp;:</b> ce camembert totalise le même montant que celui des
+      <a href="index.html">dépenses</a>. La part « emprunt » est l'écart entre les deux&nbsp;:
+      ce qui manque, et qui est emprunté sur les marchés.</p>
+      <p><b>Source&nbsp;:</b> Insee, comptes nationaux base 2020, tableaux
+      <a href="https://www.insee.fr/fr/statistiques/fichier/8574705/t_3201.xlsx">3.201</a>
+      (catégories de recettes) et
+      <a href="https://www.insee.fr/fr/statistiques/fichier/8574705/t_3217.xlsx">3.217</a>
+      (détail par impôt) —
+      <a href="https://www.insee.fr/fr/statistiques/8574705">page de référence</a>.</p>
+    </div>
+  </div>
 
-    <p>
-      Les données existent&nbsp;: elles vivent dans les mêmes comptes nationaux
-      que les dépenses, mais dans d'autres tableaux, avec une nomenclature
-      différente. Il reste à les extraire et à vérifier, comme pour les
-      dépenses, que le détail retombe exactement sur le total publié.
-    </p>
-
-    <p class="retour">
-      <a href="index.html">← Revenir au graphique des dépenses</a>
-    </p>
-
-  </article>
 </main>
 
 <footer class="wrap">
   <p>
-    <a href="index.html">Le graphique</a> ·
+    Données&nbsp;: Insee, comptes nationaux base 2020, sous
+    <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence">Licence Ouverte</a>.
+    Le détail par impôt commence en 1995. Les postes négatifs (crédits d'impôt,
+    impôts non recouvrables) sont listés sous la légende plutôt que dessinés&nbsp;:
+    un secteur de camembert ne peut pas avoir une aire négative.
+  </p>
+  <p>
+    Site indépendant, sans affiliation avec l'Insee ni aucune administration.
+    Révision&nbsp;: <span id="maj"></span>.
+  </p>
+  <p>
+    <a href="index.html">Où va l'argent</a> ·
     <a href="debat.html">Pourquoi ce site existe</a> ·
-    <a href="https://github.com/Jbbouille/budgetetatfrancais.fr">Code source sur GitHub</a>
+    <a href="https://github.com/Jbbouille/budgetetatfrancais.fr">Code source sur GitHub</a> ·
+    <a href="data/recettes.json">Données (JSON)</a>
   </p>
 </footer>
 
+<script src="assets/recettes.js"></script>
 </body>
 </html>

@@ -35,11 +35,14 @@ jobs:
       - name: Construire data/cofog.json
         run: python scripts/build_data.py
 
+      - name: Construire data/recettes.json
+        run: python scripts/build_recettes.py
+
       - name: Commiter si les chiffres ont changé
         run: |
           set -euo pipefail
 
-          if git diff --quiet -- data/cofog.json; then
+          if git diff --quiet -- data/cofog.json data/recettes.json; then
             echo "Aucun changement."
             exit 0
           fi
@@ -49,17 +52,18 @@ jobs:
           # vide de sens tous les mois. Comparaison sur les octets : passer du
           # JSON accentué par des variables shell dépend de la locale.
           sans_date() { sed 's/"genere":"[^"]*",//' "$1"; }
-          git show HEAD:data/cofog.json > /tmp/avant.json
+          git show HEAD:data/cofog.json    > /tmp/avant_cofog.json
+          git show HEAD:data/recettes.json > /tmp/avant_recettes.json
 
-          if diff -q <(sans_date /tmp/avant.json) <(sans_date data/cofog.json) > /dev/null; then
+          if diff -q <(sans_date /tmp/avant_cofog.json) <(sans_date data/cofog.json) > /dev/null              && diff -q <(sans_date /tmp/avant_recettes.json) <(sans_date data/recettes.json) > /dev/null; then
             echo "Seul l'horodatage a changé : on ne commite pas."
-            git checkout -- data/cofog.json
+            git checkout -- data/cofog.json data/recettes.json
             exit 0
           fi
 
           echo "Les chiffres ont changé."
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/cofog.json
+          git add data/cofog.json data/recettes.json
           git commit -m "Données Insee régénérées automatiquement"
           git push

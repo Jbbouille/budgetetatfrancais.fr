@@ -429,6 +429,7 @@
       cellule = cellule === d.code ? null : d.code;
       drawCellule();
       repaint();
+      ecrireURL();   // cette branche ne repasse pas par draw()
       return;
     }
     cellule = null;

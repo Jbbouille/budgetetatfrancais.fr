@@ -127,7 +127,14 @@
     }
 
     const total = items.reduce((a, d) => a + d.v, 0);
-    return items.map((d, i) => ({ ...d, i, color: COLORS[i], share: (d.v / total) * 100, total }));
+    // Un poste nul l'année affichée (impôt supprimé, dispositif pas encore créé)
+    // n'est pas une part : dessiné, il aurait un angle nul et n'existerait que
+    // dans la légende. La couleur reste indexée sur le rang de l'année de
+    // référence, pour qu'elle désigne toujours le même poste.
+    return items
+      .map((d, ci) => ({ ...d, ci }))
+      .filter((d) => d.v > 0)
+      .map((d, i) => ({ ...d, i, color: COLORS[d.ci], share: (d.v / total) * 100, total }));
   }
 
   const parentTotal = () => {

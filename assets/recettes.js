@@ -108,11 +108,14 @@
     }
 
     // Un secteur ne peut pas avoir une aire négative : on met ces postes de côté.
-    const negatifs = items.filter((d) => d.v < 0);
-    const positifs = items.filter((d) => d.v >= 0);
+    // Les postes nuls l'année affichée sont écartés : dessinés, ils auraient un
+    // angle nul. La couleur reste indexée sur le rang de l'année de référence.
+    const rangs = items.map((d, ci) => ({ ...d, ci }));
+    const negatifs = rangs.filter((d) => d.v < 0);
+    const positifs = rangs.filter((d) => d.v > 0);
     const total = positifs.reduce((a, d) => a + d.v, 0);
     return {
-      parts: positifs.map((d, i) => ({ ...d, i, color: COLORS[i], share: (d.v / total) * 100 })),
+      parts: positifs.map((d, i) => ({ ...d, i, color: COLORS[d.ci], share: (d.v / total) * 100 })),
       negatifs, total,
     };
   }

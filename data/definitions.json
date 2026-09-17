@@ -4,7 +4,6 @@
   "url": "https://www.insee.fr/fr/metadonnees/definition/c1064",
   "note": "Résumés rédigés d'après la nomenclature COFOG. Les liens ci-dessous renvoient aux définitions et publications de l'Insee."
  },
- "racine": "La COFOG classe chaque euro dépensé selon sa finalité, et non selon l'administration qui l'a versé. Une retraite payée par la Sécurité sociale et une aide sociale versée par un département relèvent ainsi de la même fonction.",
  "postes": {
   "GF01": "Le fonctionnement des institutions : exécutif, législatif, affaires étrangères et aide au développement, recherche fondamentale. Par convention, la charge de la dette y figure aussi lorsque l'emprunt ne peut être rattaché à une finalité précise.",
   "GF02": "La défense militaire et civile : forces armées, équipements, aide militaire extérieure et recherche liée à la défense.",
@@ -31,20 +30,6 @@
   "GF0409": "Les transports : routes, ferroviaire, transports urbains, aérien et maritime — infrastructures comme subventions d'exploitation."
  },
  "liens": {
-  "racine": [
-   {
-    "label": "Nomenclature COFOG",
-    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
-   },
-   {
-    "label": "Insee Première n° 2093 — l'usage de l'argent public",
-    "url": "https://www.insee.fr/fr/statistiques/8735252"
-   },
-   {
-    "label": "Tableaux par fonction (comptes de la Nation)",
-    "url": "https://www.insee.fr/fr/statistiques/8574707"
-   }
-  ],
   "GF01": [
    {
     "label": "Nomenclature COFOG",

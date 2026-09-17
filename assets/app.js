@@ -360,8 +360,11 @@
     add('Toutes les fonctions', 0, stack.length === 0);
     stack.forEach((n, i) => add(`${emo(n.code)} ${n.label}`, i + 1, i === stack.length - 1));
 
+    // Pas de définition à la racine : « Que recouvre ce poste ? » n'a pas de
+    // sens tant qu'aucun poste n'est ouvert.
     const node = last(stack);
-    $('#def-niveau').innerHTML = definition(node && node.kind === 'fn' ? node.code : null);
+    $('#def-niveau').innerHTML =
+      node && node.kind === 'fn' ? definition(node.code) : '';
   }
 
   /* ---------- démarrage ---------- */

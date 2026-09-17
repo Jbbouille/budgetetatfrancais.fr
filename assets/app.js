@@ -28,7 +28,7 @@
     return e;
   };
 
-  let DATA = null;
+  let DATA = null, DEFS = null;
   let stack = [];          // pile de navigation : [] = racine
   let hovered = null;
   let yi = 0;              // index de l'année affichée dans DATA.years
@@ -183,6 +183,17 @@
     $('#y-next').addEventListener('click', () => go(yi + 1));
   }
 
+  /* Depliant : ce que recouvre un poste. Replie par defaut pour ne pas gener
+     la lecture, et toujours accompagne du lien vers la definition de reference. */
+  function definition(code) {
+    if (!DEFS) return '';
+    const texte = code ? DEFS.postes[code] : DEFS.racine;
+    if (!texte) return '';
+    return `<details class="def"><summary>Que recouvre ce poste&nbsp;?</summary>` +
+      `<p>${texte}</p><p class="src">Nomenclature de référence&nbsp;: ` +
+      `<a href="${DEFS.source.url}">${DEFS.source.label}</a>. ${DEFS.source.note}</p></details>`;
+  }
+
   /* Montre la cellule exacte du classeur Insee d'où sort le chiffre affiché.
      Les coordonnées viennent de build_data.py, qui retient le numéro de ligne
      de chaque poste au moment de lire le .xlsx. */
@@ -202,7 +213,8 @@
       `<span class="ou">` +
       `<a href="${s.url}">${s.fichier}</a> · feuille <code>${s.feuille}</code>` +
       ` · ligne <code>${node.r}</code> · colonne <code>${s.colonnes[yi]}</code>` +
-      ` · cellule <code>${ref}</code></span>`;
+      ` · cellule <code>${ref}</code></span>` +
+      definition(cellule);
   }
 
   function drawPie(data) {
@@ -345,14 +357,21 @@
     };
     add('Toutes les fonctions', 0, stack.length === 0);
     stack.forEach((n, i) => add(`${emo(n.code)} ${n.label}`, i + 1, i === stack.length - 1));
+
+    const node = last(stack);
+    $('#def-niveau').innerHTML = definition(node && node.kind === 'fn' ? node.code : null);
   }
 
   /* ---------- démarrage ---------- */
 
-  fetch('data/cofog.json')
-    .then((r) => r.json())
-    .then((d) => {
-      DATA = d;
+  Promise.all([
+    fetch('data/cofog.json').then((r) => r.json()),
+    // Les definitions sont facultatives : si le fichier manque, la page
+    // fonctionne, le depliant « que recouvre ce poste » ne s'affiche pas.
+    fetch('data/definitions.json').then((r) => r.json()).catch(() => null),
+  ])
+    .then(([d, defs]) => {
+      DATA = d; DEFS = defs;
       setupYears();
       $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });

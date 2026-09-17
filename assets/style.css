@@ -170,6 +170,18 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 .cellule code { font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
   font-size: .9em; color: var(--ink); background: var(--hover); padding: .05em .35em; border-radius: 2px; }
 
+/* Définition d'un poste : repliée par défaut, pour ne pas alourdir la lecture. */
+.def { margin-top: .6rem; font-size: .8125rem; }
+.cellule .def { margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--rule-2); }
+.def > summary { color: var(--ink-3); cursor: pointer; list-style: none;
+  display: inline-flex; align-items: center; gap: .3rem; padding: .1rem 0; }
+.def > summary::-webkit-details-marker { display: none; }
+.def > summary::before { content: "▸"; font-size: .7em; transition: transform .12s; }
+.def[open] > summary::before { transform: rotate(90deg); }
+.def > summary:hover { color: var(--ink); }
+.def p { margin: .5rem 0 0; color: var(--ink-2); max-width: 66ch; }
+.def .src { color: var(--ink-3); font-size: .9em; }
+
 /* ---------- page article ---------- */
 
 .texte { max-width: 62ch; margin-top: clamp(2rem, 5vw, 3rem); }
@@ -182,9 +194,6 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 
 /* ---------- pied ---------- */
 
-.wip { font-size: .6875rem; text-transform: uppercase; letter-spacing: .05em;
-  border: 1px solid var(--rule); border-radius: 999px; padding: .05em .45em;
-  color: var(--ink-3); white-space: nowrap; }
 
 footer { padding: 2rem 0 2.5rem; border-top: 1px solid var(--rule); }
 footer p { font-size: .8125rem; color: var(--ink-3); max-width: 70ch; margin: 0 0 .6rem; }

@@ -86,7 +86,10 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
 
 /* ---------- sélecteur d'année ---------- */
 
-.years { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.5rem; }
+/* Le curseur est borné : étalé sur toute la largeur d'un grand écran, trente
+   années représentent des dizaines de pixels par an et viser devient pénible. */
+.years { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.5rem;
+  max-width: 30rem; }
 /* Les flèches sont des emoji : pas de cadre ni de couleur de texte à leur
    appliquer, la glyphe porte déjà sa propre couleur. */
 .years button {

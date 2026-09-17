@@ -6,16 +6,26 @@ affichées en lecture seule sous forme de feuilles de calcul.
 
 ## Ce que le site montre
 
-- **Le camembert** : la dépense publique 2024 ventilée selon la nomenclature
-  COFOG. Chaque part s'ouvre pour révéler son détail (« Protection sociale » →
-  vieillesse, maladie, famille, chômage…). Au-delà de six parts, le reste est
-  replié dans « Autres », lui-même cliquable.
-- **Les feuilles** : sources, fichiers Excel de l'Insee, données du graphique
-  au niveau affiché, et chiffres clés 2025.
+- **Le camembert** : la dépense publique ventilée selon la nomenclature COFOG,
+  **année par année de 1995 à 2024** (curseur au-dessus du graphique). Chaque
+  part s'ouvre pour révéler son détail (« Protection sociale » → vieillesse,
+  maladie, famille, chômage…). Au-delà de six parts, le reste est replié dans
+  « Autres », lui-même cliquable.
+
+  L'ordre des parts et leurs couleurs sont figés sur l'année de référence (la
+  plus récente), jamais sur le classement de l'année affichée : une couleur
+  désigne donc toujours la même fonction quand on déplace le curseur.
+- **Un emoji par poste** : les sous-fonctions héritent de l'emoji de leur
+  fonction parente, sauf exceptions listées dans `EMOJI` (app.js).
+- **La cellule d'origine** : cliquer sur un poste qui n'a plus de sous-niveau
+  affiche d'où sort le chiffre dans le classeur Insee — fichier, feuille,
+  ligne, colonne et référence de cellule (par exemple `AH78` pour la
+  vieillesse en 2024). Les coordonnées sont relevées par `build_data.py` au
+  moment de la lecture du .xlsx, jamais saisies.
 
 ## Périmètre — à ne pas confondre avec « le budget de l'État »
 
-Le total affiché (1 714 Md€ en 2025) couvre **l'ensemble des administrations
+Le total affiché (1 671,8 Md€ en 2024) couvre **l'ensemble des administrations
 publiques** au sens de la comptabilité nationale : l'État et ses opérateurs, la
 Sécurité sociale et les collectivités locales. C'est bien plus large que le
 budget général de l'État voté au Parlement (~500 Md€), qui ignore la Sécurité
@@ -32,24 +42,51 @@ différents :
 | Ventilation par fonction (COFOG) | 2024 | 2026 |
 | Ventilation par fonction | 2025 | annoncée pour décembre 2026 |
 
-Le site affiche donc la dernière donnée disponible pour chaque question, et le
-dit explicitement sous le graphique.
+Le camembert porte donc sur 1995-2024.
 
 ## Structure
 
 ```
-index.html            page unique
-assets/style.css      styles (fond blanc, sans dépendance externe)
-assets/app.js         camembert SVG + feuilles, sans bibliothèque
-data/cofog.json       généré par scripts/build_data.py
-data/meta.json        agrégats 2025 + table des sources (maintenu à la main)
-scripts/build_data.py régénère data/cofog.json depuis insee.fr
-scripts/check_links.py vérifie que chaque lien cité répond encore
-CNAME                 budgetetatfrancais.fr
+index.html                      le camembert
+debat.html                      pourquoi ce site existe (chiffres lus dans cofog.json)
+recettes.html                   d'où vient l'argent — en cours de construction
+assets/style.css                styles (fond blanc, sans dépendance externe)
+assets/app.js                   camembert SVG, sans bibliothèque
+assets/debat.js                 remplit les chiffres de debat.html
+data/cofog.json                 LES DONNÉES — généré par scripts/build_data.py
+data/meta.json                  registre des sources (pour check_links.py)
+scripts/build_data.py           régénère data/cofog.json depuis insee.fr
+scripts/check_links.py          vérifie que chaque lien cité répond encore
+.github/workflows/donnees.yml   régénère les données, mensuel
+.github/workflows/liens.yml     vérifie les liens, mensuel
+CNAME                           budgetetatfrancais.fr
 ```
 
 Aucune dépendance d'exécution : pas de CDN, pas de bibliothèque de graphiques,
 pas d'étape de build. Les fichiers sont servis tels quels.
+
+## D'où viennent les données
+
+**Rien n'est récupéré depuis insee.fr au chargement de la page.** Le navigateur
+lit un seul fichier, `data/cofog.json`, versionné dans le dépôt.
+
+Ce fichier n'est pas saisi à la main : il est **généré** par
+`scripts/build_data.py`, qui télécharge les .xlsx de l'Insee, les lit avec
+openpyxl et écrit le JSON. Le pipeline est donc :
+
+```
+insee.fr (.xlsx)  --build_data.py-->  data/cofog.json  --fetch-->  page
+      ^ manuel, à la main, une fois par an        ^ versionné      ^ à l'exécution
+```
+
+Pourquoi pas un appel direct à l'Insee depuis le navigateur : l'Insee ne publie
+pas ces tableaux via une API JSON, les fichiers sont des .xlsx (qu'il faudrait
+parser côté client), et le site est servi depuis un autre domaine sans en-têtes
+CORS permettant de les lire. Un JSON figé est aussi plus rapide et reste
+consultable si insee.fr est indisponible.
+
+`data/meta.json` n'est plus lu par la page ; il sert uniquement de registre de
+sources à `scripts/check_links.py`.
 
 ## Régénérer les données
 
@@ -69,7 +106,25 @@ python scripts/check_links.py
 ```
 
 Le site affiche ses sources : un lien mort est un bug visible. Le script teste
-les 37 URL citées et sort en erreur si l'une ne répond pas 200.
+les URL de `index.html` et de `data/meta.json`, et sort en erreur si l'une ne
+répond pas 200.
+
+## Automatisation (GitHub Actions)
+
+Les deux scripts tournent seuls, une fois par mois, et se lancent aussi à la
+demande depuis l'onglet Actions :
+
+| Workflow | Quand | Ce qu'il fait |
+|---|---|---|
+| `liens.yml` | le 1er du mois, et à chaque modification des liens | lance `check_links.py` ; échoue si une source ne répond plus |
+| `donnees.yml` | le 15 du mois | relance `build_data.py` et commite `data/cofog.json` **uniquement si les chiffres ont changé** |
+
+`donnees.yml` ignore le champ `genere`, qui change à chaque exécution : sans
+cela le dépôt recevrait un commit vide de sens tous les mois.
+
+Limite à connaître : ces workflows gardent le site synchronisé avec la page
+Insee configurée dans `build_data.py`. Ils ne détectent pas l'arrivée d'un
+nouveau millésime, qui vit à une autre adresse — voir la section suivante.
 
 ## Mise à jour annuelle
 

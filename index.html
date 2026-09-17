@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Budget de l'État français — où va l'argent public</title>
-<meta name="description" content="Les 1 714 milliards d'euros de dépenses publiques françaises, en un camembert cliquable. Données Insee, sources téléchargeables.">
+<title>Dépenses publiques françaises — 1995 à 2024</title>
+<meta name="description" content="Les dépenses publiques françaises de 1995 à 2024, en un camembert cliquable. Données Insee, sources téléchargeables.">
 <link rel="canonical" href="https://budgetetatfrancais.fr/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:title" content="Budget de l'État français — où va l'argent public">
-<meta property="og:description" content="Les 1 714 milliards d'euros de dépenses publiques françaises, en un camembert cliquable. Données Insee.">
+<meta property="og:title" content="Dépenses publiques françaises — 1995 à 2024">
+<meta property="og:description" content="Les dépenses publiques françaises de 1995 à 2024, en un camembert cliquable. Données Insee.">
 <meta property="og:url" content="https://budgetetatfrancais.fr/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%232a78d6'/><path d='M50 50 L50 6 A44 44 0 0 1 93 59 Z' fill='%23eb6834'/></svg>">
 <link rel="stylesheet" href="assets/style.css">
@@ -17,22 +17,22 @@
 <body>
 
 <header class="wrap">
-  <h1>Où va l'argent public en France&nbsp;?</h1>
-  <p class="lede">
-    En 2025, les administrations publiques françaises ont dépensé
-    <strong>1&nbsp;714,2 milliards d'euros</strong>, soit 57,3&nbsp;% du produit intérieur brut.
-    Voici à quoi cette somme a servi.
-  </p>
-  <p class="note">
-    Cliquez sur une part pour l'ouvrir. Le périmètre est celui de la comptabilité nationale&nbsp;:
-    l'État et ses opérateurs, la Sécurité sociale et les collectivités locales — plus large, donc,
-    que le seul budget voté de l'État.
-  </p>
+  <h1>Dépenses publiques françaises</h1>
+  <p class="sub" id="sub"></p>
 </header>
 
 <main class="wrap">
 
   <div class="pie-block">
+    <div class="years">
+      <button type="button" id="y-prev" aria-label="Année précédente">⬅️</button>
+      <input type="range" id="y-range" min="0" max="0" step="1" value="0"
+             aria-label="Année affichée" list="y-ticks">
+      <datalist id="y-ticks"></datalist>
+      <button type="button" id="y-next" aria-label="Année suivante">➡️</button>
+      <output id="y-out" for="y-range"></output>
+    </div>
+
     <nav class="crumb" id="crumb" aria-label="Niveau affiché"></nav>
 
     <div class="pie-layout">
@@ -40,48 +40,36 @@
       <ul class="keys" id="keys"></ul>
     </div>
 
+    <p class="cellule" id="cellule" hidden></p>
+
     <div class="caption">
-      <p><b>Lecture&nbsp;:</b> <span id="lecture"></span></p>
-      <p><b>Champ&nbsp;:</b> ensemble des administrations publiques (S13), France, 2024 —
-      dernière année pour laquelle l'Insee a publié la ventilation par fonction.
-      Les montants sont en euros courants.</p>
+      <p><b>Champ&nbsp;:</b> ensemble des administrations publiques (S13), France, <span id="champ-annee"></span>.
+      Montants en euros courants.</p>
       <p><b>Source&nbsp;:</b> Insee, comptes nationaux base 2020, nomenclature COFOG,
       <a href="https://www.insee.fr/fr/statistiques/fichier/8574707/T_3301.xlsx">tableau&nbsp;3.301</a>
       (<a href="https://www.insee.fr/fr/statistiques/8574707">page de référence</a>).</p>
     </div>
   </div>
 
-  <section class="sheet-block">
-    <h2>Les sources, feuille par feuille</h2>
-    <p>
-      Ce site ne produit aucun chiffre&nbsp;: il met en forme des fichiers publiés par l'Insee.
-      Les voici tels quels, en lecture seule. Tous les montants affichés plus haut se
-      retrouvent dans ces fichiers.
-    </p>
-
-    <div class="tabs" role="tablist" id="tabs"></div>
-    <div class="sheet" id="sheet" role="tabpanel"></div>
-    <div class="sheet-foot">
-      <span id="sheet-info"></span>
-      <span>Lecture seule · Source&nbsp;: Insee, <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence">Licence Ouverte</a></span>
-    </div>
-  </section>
 
 </main>
 
 <footer class="wrap">
   <p>
-    Site indépendant de visualisation de données publiques, sans affiliation avec l'Insee
-    ni avec aucune administration. Dernière révision&nbsp;: <span id="maj"></span>.
+    Données&nbsp;: Insee, comptes nationaux base 2020, sous
+    <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence">Licence Ouverte</a>.
+    Ventilation par fonction disponible de 1995 à 2024&nbsp;; le millésime 2025 est annoncé
+    par l'Insee pour décembre 2026.
   </p>
   <p>
-    Les agrégats 2025 (dépense totale, déficit, dette) et la ventilation par fonction 2024
-    proviennent de deux publications distinctes&nbsp;: l'Insee publie la seconde avec un an de
-    décalage. La ventilation 2025 est annoncée pour décembre 2026.
+    Site indépendant, sans affiliation avec l'Insee ni aucune administration.
+    Révision&nbsp;: <span id="maj"></span>.
   </p>
   <p>
-    Une erreur de mise en forme reste possible&nbsp;: en cas de doute, le fichier Insee cité
-    fait foi. <a href="data/cofog.json">Données du site (JSON)</a>.
+    <a href="debat.html">Pourquoi ce site existe</a> ·
+    <a href="recettes.html">D'où vient l'argent</a> <span class="wip">en cours</span> ·
+    <a href="https://github.com/Jbbouille/budgetetatfrancais.fr">Code source sur GitHub</a> ·
+    <a href="data/cofog.json">Données (JSON)</a>
   </p>
 </footer>
 

@@ -4,11 +4,14 @@
     python scripts/check_links.py
 
 Le site affiche ses sources ; un lien mort est donc un bug visible. Ce script
-teste toutes les URL de data/meta.json et sort en erreur si l'une d'elles ne
-repond pas 200, pour pouvoir etre branche sur une verification periodique.
+teste toutes les URL de index.html et de data/meta.json, et sort en erreur si
+l'une d'elles ne repond pas 200. Il est lance par .github/workflows/liens.yml.
+
+Le domaine du site lui-meme est exclu : il ne resout que depuis la production.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -20,18 +23,36 @@ except ImportError:  # pragma: no cover
 ROOT = Path(__file__).resolve().parent.parent
 META = json.loads((ROOT / "data" / "meta.json").read_text(encoding="utf-8"))
 
-UA = {"User-Agent": "Mozilla/5.0 (verification de liens, site budgetetatfrancais.fr)"}
+SELF = "budgetetatfrancais.fr"
+UA = {"User-Agent": f"Mozilla/5.0 (verification de liens, https://{SELF})"}
 
 
 def collect():
-    urls = []
+    """Les URL citees, nommees par leur origine, sans doublon."""
+    urls = {}
+
+    # 1. le registre de sources
     for key, src in META["sources"].items():
         for field in ("page", "donnees", "pdf"):
             if src.get(field):
-                urls.append((f"{key}.{field}", src[field]))
+                urls.setdefault(src[field], f"meta:{key}.{field}")
         for t in src.get("tableaux", []):
-            urls.append((f"{key}.{t['id']}", t["url"]))
-    return urls
+            urls.setdefault(t["url"], f"meta:{key}.{t['id']}")
+
+    # 2. les liens reellement affiches sur les pages
+    for page in ("index.html", "debat.html", "recettes.html"):
+        html = (ROOT / page).read_text(encoding="utf-8")
+        for url in re.findall(r"""https://[^"'<> )]+""", html):
+            urls.setdefault(url.rstrip(".,)"), page)
+
+    # On exclut le site lui-meme (il ne resout que depuis la production), mais
+    # en comparant l'origine : le depot GitHub s'appelle aussi
+    # "budgetetatfrancais.fr", et une recherche de sous-chaine l'ecarterait.
+    return sorted(
+        ((nom, url) for url, nom in urls.items()
+         if not url.startswith(f"https://{SELF}")),
+        key=lambda t: t[1],
+    )
 
 
 def main() -> None:

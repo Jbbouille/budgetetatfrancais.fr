@@ -15,6 +15,7 @@ vivent dans data/meta.json, qui est maintenu a la main et cite sa source ligne
 par ligne.
 """
 
+import datetime
 import json
 import re
 import sys
@@ -23,6 +24,7 @@ from pathlib import Path
 try:
     import openpyxl
     import requests
+    from openpyxl.utils import get_column_letter
 except ImportError:  # pragma: no cover
     sys.exit("Dependances manquantes : pip install openpyxl requests")
 
@@ -79,7 +81,10 @@ def read(path: Path, sheet: str, want: str = "OTE"):
     rows = list(ws.iter_rows(values_only=True))
     years = [int(c) for c in rows[3][4:] if c is not None and str(c).strip().isdigit()]
     out, cur = {}, None
-    for row in rows[5:]:
+    # enumerate a partir de 6 : rows[5] est la 6e ligne du classeur, et Excel
+    # numerote ses lignes a partir de 1. On retient ce numero pour pouvoir
+    # renvoyer l'utilisateur vers la cellule exacte du fichier.
+    for excel_row, row in enumerate(rows[5:], start=6):
         head = row[0]
         if isinstance(head, str) and head.strip() and len(head.strip()) <= 5:
             cur = head.strip()
@@ -94,7 +99,7 @@ def read(path: Path, sheet: str, want: str = "OTE"):
             for c in row[4 : 4 + len(years)]
         ]
         if values:
-            out.setdefault(code, {"label": label, "v": values})
+            out.setdefault(code, {"label": label, "v": values, "r": excel_row})
     return years, out
 
 
@@ -121,9 +126,21 @@ def main() -> None:
             k: v["v"] for k, v in block.items() if len(k) == 4 or k == "_Z"
         }
 
+    # Les annees commencent en colonne E (5e colonne) : on precalcule la
+    # lettre de colonne de chaque annee pour l'afficher telle quelle.
+    colonnes = [get_column_letter(5 + i) for i in range(len(years))]
+
     data = {
+        "genere": datetime.date.today().isoformat(),
         "millesime": years[-1],
         "years": years,
+        "source": {
+            "fichier": "T_3301.xlsx",
+            "feuille": "T_3301",
+            "url": f"{BASE}/T_3301.xlsx",
+            "page": "https://www.insee.fr/fr/statistiques/8574707",
+            "colonnes": colonnes,
+        },
         "apu": apu,
         "natures": natures,
         "secteurs": secteurs,

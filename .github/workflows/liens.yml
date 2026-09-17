@@ -1,0 +1,43 @@
+name: Vérifier les liens
+
+# Le site affiche ses sources : un lien mort est un bug visible. On vérifie
+# donc à chaque modification des liens, et une fois par mois au cas où l'Insee
+# réorganiserait ses URL sans prévenir.
+
+on:
+  push:
+    paths:
+      - index.html
+      - debat.html
+      - recettes.html
+      - data/meta.json
+      - scripts/check_links.py
+      - .github/workflows/liens.yml
+  pull_request:
+    paths:
+      - index.html
+      - debat.html
+      - recettes.html
+      - data/meta.json
+  schedule:
+    - cron: '0 6 1 * *'   # le 1er de chaque mois, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  liens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les dépendances
+        run: pip install --quiet requests
+
+      - name: Vérifier que chaque source répond
+        run: python scripts/check_links.py

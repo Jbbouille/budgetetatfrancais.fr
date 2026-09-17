@@ -1,4 +1,4 @@
-/* budgetetatfrancais.fr — camembert cliquable + feuilles de sources.
+/* budgetetatfrancais.fr — camembert cliquable des dépenses publiques.
    Aucune dépendance externe : SVG construit à la main. */
 
 (() => {
@@ -28,13 +28,53 @@
     return e;
   };
 
-  let DATA = null, META = null;
+  let DATA = null;
   let stack = [];          // pile de navigation : [] = racine
   let hovered = null;
+  let yi = 0;              // index de l'année affichée dans DATA.years
+  let cellule = null;      // code du poste terminal dont on montre la cellule Excel
 
   const last = (a) => a[a.length - 1];
-  const L1 = () => Object.keys(DATA.apu).filter((k) => k.length === 4).sort();
-  const val = (code) => last(DATA.apu[code].v);
+  const val = (code) => DATA.apu[code].v[yi] ?? 0;
+  const year = () => DATA.years[yi];
+
+
+  /* Un emoji par poste. Les sous-fonctions héritent de celui de leur fonction
+     parente sauf mention explicite ci-dessous. L'emoji complète le libellé et
+     la pastille de couleur, il ne les remplace pas. */
+  const EMOJI = {
+    GF01: '\u{1F3DB}️',  // services généraux
+    GF02: '\u{1F6E1}️',  // défense
+    GF03: '\u{1F693}',        // ordre et sécurité publics
+    GF04: '\u{1F3D7}️',  // affaires économiques
+    GF05: '\u{1F331}',        // environnement
+    GF06: '\u{1F3E0}',        // logement et équipements collectifs
+    GF07: '\u{1F3E5}',        // santé
+    GF08: '\u{1F3AD}',        // loisirs, culture et culte
+    GF09: '\u{1F393}',        // enseignement
+    GF10: '\u{1F91D}',        // protection sociale
+    // sous-fonctions notables
+    GF0104: '\u{1F9EA}',       // recherche fondamentale
+    GF0107: '\u{1F4B8}',       // opérations concernant la dette publique
+    GF0405: '\u{1F69C}',       // agriculture, sylviculture, pêche
+    GF0406: '⚡',          // combustibles et énergie
+    GF0409: '\u{1F6E3}️', // transports
+    GF0701: '\u{1F48A}',       // produits et appareils médicaux
+    GF0703: '\u{1F6CF}️', // services hospitaliers
+    GF0901: '\u{1F9F8}',       // enseignement préscolaire et primaire
+    GF0902: '\u{1F4DA}',       // enseignement secondaire
+    GF0904: '\u{1F3EB}',       // enseignement supérieur
+    GF1001: '\u{1FA7A}',       // maladie et invalidité
+    GF1002: '\u{1F475}',       // vieillesse
+    GF1003: '\u{1F54A}️', // survivants
+    GF1004: '\u{1F476}',       // famille et enfants
+    GF1005: '\u{1F4BC}',       // chômage
+    GF1006: '\u{1F3E0}',       // logement
+    GF1007: '\u{1F91A}',       // exclusion sociale
+    AUTRES: '\u{1F4E6}',
+  };
+  const emo = (code) =>
+    code ? (EMOJI[code] || EMOJI[code.slice(0, 4)] || '') : EMOJI.AUTRES;
 
   const shortLabel = (s) => s
     .replace('Services généraux des administrations publiques', 'Services généraux')
@@ -43,35 +83,49 @@
 
   /* ---------- construction du niveau affiché ---------- */
 
+  /* Les codes COFOG encodent la profondeur dans leur longueur : GF10 (niveau 1),
+     GF1002 (niveau 2). Un enfant fait donc exactement deux caractères de plus
+     que son parent — sans cette contrainte de longueur, un code se retrouverait
+     dans sa propre liste d'enfants et on pourrait descendre indéfiniment. */
   function children(code) {
-    if (!code) return L1();
-    return Object.keys(DATA.apu).filter((k) => k.length === 6 && k.startsWith(code));
+    const n = code ? code.length + 2 : 4;
+    return Object.keys(DATA.apu)
+      .filter((k) => k.length === n && (!code || k.startsWith(code)))
+      .sort();
   }
 
-  /* Renvoie les parts du niveau courant, triées, repliées à SLOTS éléments. */
+  /* L'ordre des parts et leur couleur sont fixés par une année de référence (la
+     dernière disponible), jamais par le classement de l'année affichée : sinon
+     déplacer le curseur repeindrait les parts et une couleur ne désignerait plus
+     la même fonction d'une année à l'autre. Seules les valeurs suivent l'année. */
+  const REF = () => DATA.years.length - 1;
+  const at = (code, i) => DATA.apu[code].v[i] ?? 0;
+  const everPositive = (code) => DATA.apu[code].v.some((x) => x > 0);
+
   function slices() {
     const node = last(stack) || null;
     const codeOf = node && node.kind === 'fn' ? node.code : null;
+    const ref = REF();
+
+    let codes = node && node.kind === 'rest'
+      ? node.codes.slice()
+      : children(codeOf).filter(everPositive);
+
+    codes.sort((a, b) => at(b, ref) - at(a, ref));
 
     let items;
-    if (node && node.kind === 'rest') {
-      items = node.codes.map((c) => ({ code: c, label: shortLabel(DATA.apu[c].label), v: val(c) }));
-    } else {
-      items = children(codeOf)
-        .map((c) => ({ code: c, label: shortLabel(DATA.apu[c].label), v: val(c) }))
-        .filter((d) => d.v > 0);
-    }
-    items.sort((a, b) => b.v - a.v);
-
-    if (items.length > SLOTS) {
-      const head = items.slice(0, SLOTS - 1);
-      const tail = items.slice(SLOTS - 1);
-      head.push({
-        code: null, rest: tail.map((t) => t.code), label: 'Autres',
-        v: tail.reduce((a, t) => a + t.v, 0), count: tail.length,
+    if (codes.length > SLOTS) {
+      const tail = codes.slice(SLOTS - 1);
+      items = codes.slice(0, SLOTS - 1)
+        .map((c) => ({ code: c, label: shortLabel(DATA.apu[c].label), v: val(c) }));
+      items.push({
+        code: null, rest: tail, label: 'Autres',
+        v: tail.reduce((a, c) => a + val(c), 0), count: tail.length,
       });
-      items = head;
+    } else {
+      items = codes.map((c) => ({ code: c, label: shortLabel(DATA.apu[c].label), v: val(c) }));
     }
+
     const total = items.reduce((a, d) => a + d.v, 0);
     return items.map((d, i) => ({ ...d, i, color: COLORS[i], share: (d.v / total) * 100, total }));
   }
@@ -89,12 +143,66 @@
 
   function draw() {
     readColors();
+    drawYear();
     const data = slices();
     drawPie(data);
     drawKeys(data);
     drawCrumb();
-    drawLecture(data);
-    drawSheet();
+    drawCellule();
+  }
+
+  /* ---------- sélecteur d'année ---------- */
+
+  function drawYear() {
+    $('#y-out').textContent = year();
+    $('#champ-annee').textContent = year();
+    $('#sub').textContent =
+      `${year()} · ${nf(val('_Z'), 1)} milliards d'euros · ensemble des administrations ` +
+      `publiques (État, Sécurité sociale, collectivités locales)`;
+    const r = $('#y-range');
+    if (r.value !== String(yi)) r.value = String(yi);
+    $('#y-prev').disabled = yi === 0;
+    $('#y-next').disabled = yi === DATA.years.length - 1;
+  }
+
+  function setupYears() {
+    const r = $('#y-range');
+    r.max = String(DATA.years.length - 1);
+    yi = DATA.years.length - 1;
+    r.value = String(yi);
+    $('#y-ticks').innerHTML = DATA.years
+      .map((y, i) => (y % 5 === 0 ? `<option value="${i}" label="${y}"></option>` : ''))
+      .join('');
+    const go = (i) => {
+      const n = Math.max(0, Math.min(DATA.years.length - 1, i));
+      if (n === yi) return;
+      yi = n; hovered = null; draw();
+    };
+    r.addEventListener('input', () => go(+r.value));
+    $('#y-prev').addEventListener('click', () => go(yi - 1));
+    $('#y-next').addEventListener('click', () => go(yi + 1));
+  }
+
+  /* Montre la cellule exacte du classeur Insee d'où sort le chiffre affiché.
+     Les coordonnées viennent de build_data.py, qui retient le numéro de ligne
+     de chaque poste au moment de lire le .xlsx. */
+  function drawCellule() {
+    const el = $('#cellule');
+    const node = cellule && DATA.apu[cellule];
+    if (!node || node.r == null) { el.hidden = true; el.innerHTML = ''; return; }
+    const s = DATA.source;
+    const ref = s.colonnes[yi] + node.r;
+    el.hidden = false;
+    const montant = node.v[yi] ?? 0;
+    const partTotale = (montant / val('_Z')) * 100;
+    el.innerHTML =
+      `<span class="emo">${emo(cellule)}</span>` +
+      `<b>${node.label}</b> — ${md(montant)} en ${year()}, soit ` +
+      `<b>${pct(partTotale)}</b> de la dépense publique totale` +
+      `<span class="ou">` +
+      `<a href="${s.url}">${s.fichier}</a> · feuille <code>${s.feuille}</code>` +
+      ` · ligne <code>${node.r}</code> · colonne <code>${s.colonnes[yi]}</code>` +
+      ` · cellule <code>${ref}</code></span>`;
   }
 
   function drawPie(data) {
@@ -158,10 +266,10 @@
 
     function showTip(d) {
       const openable = d.rest || hasChildren(d.code);
-      tip.innerHTML = `<strong>${d.label}</strong>
+      tip.innerHTML = `<strong>${emo(d.code)} ${d.label}</strong>
         <div class="r"><span>Montant</span><b>${md(d.v)}</b></div>
         <div class="r"><span>Part</span><b>${pct(d.share)}</b></div>
-        ${openable ? '<div class="r" style="margin-top:.3rem"><span>Cliquer pour ouvrir</span></div>' : ''}`;
+        <div class="r" style="margin-top:.3rem"><span>${openable ? 'Cliquer pour ouvrir' : 'Cliquer pour voir la cellule Excel'}</span></div>`;
       tip.classList.add('on');
       const r = node.getBoundingClientRect();
       tip.style.left = Math.max(0, r.width / 2 - 80) + 'px';
@@ -179,7 +287,7 @@
       const openable = d.rest || hasChildren(d.code);
       const suffix = d.rest ? ` <span class="leaf">(${d.count} postes)</span>` : '';
       b.innerHTML = `<i style="background:${d.color}"></i>
-        <span class="name">${d.label}${suffix}</span>
+        <span class="name"><span class="emo">${emo(d.code)}</span>${d.label}${suffix}</span>
         <span class="md">${md(d.v)}</span>
         <span class="pc">${pct(d.share)}</span>`;
       b.addEventListener('pointerenter', () => { hovered = d.i; repaint(); });
@@ -199,9 +307,17 @@
   }
 
   function open(d) {
-    if (d.rest) stack.push({ kind: 'rest', codes: d.rest, label: 'Autres fonctions' });
-    else if (hasChildren(d.code)) stack.push({ kind: 'fn', code: d.code, label: d.label });
-    else return;
+    if (d.rest) {
+      stack.push({ kind: 'rest', codes: d.rest, label: 'Autres fonctions', code: null });
+    } else if (hasChildren(d.code)) {
+      stack.push({ kind: 'fn', code: d.code, label: d.label });
+    } else {
+      // Poste terminal : plus rien à ouvrir, on montre d'où vient le chiffre.
+      cellule = cellule === d.code ? null : d.code;
+      drawCellule();
+      return;
+    }
+    cellule = null;
     hovered = null;
     draw();
   }
@@ -219,7 +335,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.textContent = label;
-        b.addEventListener('click', () => { stack = stack.slice(0, depth); hovered = null; draw(); });
+        b.addEventListener('click', () => { stack = stack.slice(0, depth); hovered = null; cellule = null; draw(); });
         c.appendChild(b);
         const sep = document.createElement('span');
         sep.className = 'sep';
@@ -228,164 +344,17 @@
       }
     };
     add('Toutes les fonctions', 0, stack.length === 0);
-    stack.forEach((n, i) => add(n.label, i + 1, i === stack.length - 1));
-  }
-
-  function drawLecture(data) {
-    const top = data[0];
-    const node = last(stack);
-    const total = parentTotal();
-    $('#lecture').textContent = node
-      ? `au sein du poste « ${node.label} » (${md(total)}), ${top.label.toLowerCase()} pèse ${md(top.v)}, soit ${pct(top.share)}.`
-      : `en 2024, la dépense publique atteint ${md(total)}. La protection sociale — retraites, maladie, famille, chômage — en représente à elle seule ${pct(data.find((d) => d.code === 'GF10')?.share ?? 0)}.`;
-  }
-
-  /* ---------- feuilles « tableur » ---------- */
-
-  const COL = (n) => String.fromCharCode(65 + n);
-
-  function sheetTable(headers, rows, widths = {}) {
-    const ncol = headers.length;
-    let h = '<table><thead><tr><th></th>' +
-      headers.map((_, i) => `<th>${COL(i)}</th>`).join('') + '</tr></thead><tbody>';
-    h += '<tr><th>1</th>' + headers.map((t, i) =>
-      `<td class="hd${widths[i] || ''}">${t}</td>`).join('') + '</tr>';
-    rows.forEach((r, ri) => {
-      h += `<tr><th>${ri + 2}</th>` + r.map((cell, i) => {
-        const c = typeof cell === 'object' ? cell : { t: cell };
-        return `<td class="${c.n ? 'n' : ''}${widths[i] || ''}">${c.t}</td>`;
-      }).join('') + '</tr>';
-    });
-    return h + '</tbody></table>';
-  }
-
-  const SHEETS = {
-    sources: {
-      nom: 'Sources',
-      build() {
-        const s = META.sources;
-        const order = ['ip2106', 'cn2024', 'ip2093', 'cn2023', 'cn2022', 'cn2025', 'cofog', 'demo', 'ir78'];
-        const rows = order.filter((k) => s[k]).map((k) => {
-          const x = s[k];
-          const nFiles = (x.tableaux || []).length;
-          return [
-            x.coll,
-            { t: x.titre },
-            x.date || '—',
-            `<a href="${x.page}">Ouvrir la page Insee</a>`,
-            x.donnees
-              ? `<a href="${x.donnees}">${x.donnees.split('/').pop()}</a>` +
-                (nFiles > 1 ? ` <span class="leaf">+ ${nFiles - 1} autres</span>` : '')
-              : (x.note ? '<span class="leaf">pas encore publié</span>' : '—'),
-            x.pdf ? `<a href="${x.pdf}">PDF</a>` : '—',
-          ];
-        });
-        return {
-          html: sheetTable(
-            ['Publication', 'Titre', 'Date', 'Page Insee', 'Fichier Excel', 'PDF'],
-            rows, { 1: ' wrap-cell' }),
-          info: `${rows.length} sources · tous les liens pointent vers insee.fr`,
-        };
-      },
-    },
-
-    fichiers: {
-      nom: 'Fichiers Excel',
-      build() {
-        const s = META.sources;
-        const rows = [];
-        ['cn2024', 'cn2023', 'cn2022'].forEach((k) => {
-          const x = s[k];
-          (x.tableaux || []).forEach((f) => {
-            rows.push([
-              String(x.millesime),
-              f.id,
-              { t: f.nom },
-              `<a href="${f.url}">${f.fichier}</a>`,
-              `<a href="${x.page}">page ${x.millesime}</a>`,
-              f.utilise ? 'oui' : '—',
-            ]);
-          });
-        });
-        return {
-          html: sheetTable(
-            ['Millésime', 'Tableau', 'Contenu', 'Fichier Excel', 'Page Insee', 'Utilisé ici'],
-            rows, { 2: ' wrap-cell' }),
-          info: `${rows.length} fichiers · le graphique est construit sur le tableau 3.301 du millésime 2024`,
-        };
-      },
-    },
-
-    donnees: {
-      nom: 'Données du graphique',
-      build() {
-        const data = slices();
-        const rows = data.map((d) => [
-          { t: `<span class="sw" style="background:${d.color}"></span>${d.label}` },
-          { t: nf(d.v), n: true },
-          { t: nf(d.share), n: true },
-          { t: d.code || '—' },
-        ]);
-        rows.push([{ t: '<b>Total</b>' }, { t: `<b>${nf(parentTotal())}</b>`, n: true },
-          { t: '<b>100,0</b>', n: true }, { t: '' }]);
-        const node = last(stack);
-        return {
-          html: sheetTable(['Poste', 'Md€', '% du niveau', 'Code COFOG'], rows, { 0: ' wrap-cell' }),
-          info: `niveau affiché : ${node ? node.label : 'toutes les fonctions'} · année 2024`,
-        };
-      },
-    },
-
-    cles: {
-      nom: 'Chiffres clés 2025',
-      build() {
-        const m = META.macro;
-        const d = META.deficit_secteurs;
-        const rows = [
-          ['Dépenses publiques', { t: nf(m.depenses_md), n: true }, { t: nf(m.depenses_pib), n: true }, 'Insee Première 2106'],
-          ['Recettes publiques', { t: nf(m.recettes_md), n: true }, { t: nf(m.recettes_pib), n: true }, 'Insee Première 2106'],
-          ['Déficit public', { t: nf(m.deficit_md), n: true }, { t: nf(m.deficit_pib), n: true }, 'Insee Première 2106'],
-          ['Dette publique (Maastricht)', { t: nf(m.dette_md), n: true }, { t: nf(m.dette_pib), n: true }, 'Insee Première 2106'],
-          ['Prélèvements obligatoires', { t: '—', n: true }, { t: nf(m.prelevements_pib), n: true }, 'Insee Première 2106'],
-          ...d.items.map((it) => [`Besoin de financement — ${it.nom}`,
-            { t: nf(it.v), n: true }, { t: '—', n: true }, 'Insee Première 2106, figure 3']),
-        ];
-        return {
-          html: sheetTable(['Agrégat', 'Md€', '% du PIB', 'Source'], rows, { 0: ' wrap-cell' }),
-          info: 'année 2025 · comptes nationaux base 2020',
-        };
-      },
-    },
-  };
-
-  let sheet = 'sources';
-
-  function drawSheet() {
-    const tabs = $('#tabs');
-    tabs.innerHTML = '';
-    Object.entries(SHEETS).forEach(([k, s]) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('role', 'tab');
-      b.setAttribute('aria-selected', String(k === sheet));
-      b.textContent = s.nom;
-      b.addEventListener('click', () => { sheet = k; drawSheet(); });
-      tabs.appendChild(b);
-    });
-    const { html, info } = SHEETS[sheet].build();
-    $('#sheet').innerHTML = html;
-    $('#sheet-info').textContent = info;
+    stack.forEach((n, i) => add(`${emo(n.code)} ${n.label}`, i + 1, i === stack.length - 1));
   }
 
   /* ---------- démarrage ---------- */
 
-  Promise.all([
-    fetch('data/cofog.json').then((r) => r.json()),
-    fetch('data/meta.json').then((r) => r.json()),
-  ])
-    .then(([d, m]) => {
-      DATA = d; META = m;
-      $('#maj').textContent = new Date(m.maj)
+  fetch('data/cofog.json')
+    .then((r) => r.json())
+    .then((d) => {
+      DATA = d;
+      setupYears();
+      $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       draw();
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
@@ -393,7 +362,6 @@
     .catch((err) => {
       console.error(err);
       $('#pie').innerHTML =
-        '<p style="color:var(--ink-2)">Les données n\'ont pas pu être chargées. ' +
-        'Les fichiers sources restent accessibles ci-dessous.</p>';
+        '<p style="color:var(--ink-2)">Les données n\'ont pas pu être chargées.</p>';
     });
 })();

@@ -147,6 +147,8 @@
      niveau, si le code visé n'est pas dessiné (il est replié dans « Autres postes »),
      on ouvre d'abord ce repli : le fil d'Ariane doit montrer le même trajet que
      celui qu'on suivrait à la souris. */
+  const parentDe = (c) => (P(c) && P(c).parent) || null;
+
   function ouvrirRepli(code) {
     const parts = slices().parts;
     if (parts.some((d) => d.code === code)) return;
@@ -168,26 +170,34 @@
 
     const niveau = q.get('niveau');
     const poste = q.get('poste');
-    const cible = poste || niveau;
-    if (!cible || !DATA.postes[cible]) return;
+    const valide = (c) => c && DATA.postes[c];
 
-    for (const a of ancetres(cible)) {
-      if (!DATA.postes[a]) continue;
-      ouvrirRepli(a);
-      stack.push({ kind: 'fn', code: a, label: court(DATA.postes[a].label) });
+    // Niveau à ouvrir : celui demandé, sinon celui qui contient le poste visé.
+    const aOuvrir = valide(niveau) ? niveau : (valide(poste) ? parentDe(poste) : null);
+    if (valide(aOuvrir)) {
+      for (const a of ancetres(aOuvrir)) {
+        if (!DATA.postes[a]) continue;
+        ouvrirRepli(a);
+        stack.push({ kind: 'fn', code: a, label: court(DATA.postes[a].label) });
+      }
+      ouvrirRepli(aOuvrir);
+      stack.push({ kind: 'fn', code: aOuvrir, label: court(DATA.postes[aOuvrir].label) });
     }
 
-    ouvrirRepli(cible);
-    if (poste) cellule = poste;                 // la part est sélectionnée
-    else stack.push({ kind: 'fn', code: niveau, // la fonction est ouverte
-                      label: court(DATA.postes[niveau].label) });
+    if (valide(poste)) {
+      ouvrirRepli(poste);
+      cellule = poste;
+    }
   }
 
   function ecrireURL() {
     const node = last(stack);
     const q = new URLSearchParams();
+    // Les deux sont écrits quand les deux ont un sens : `niveau` dit ce qui est
+    // ouvert, `poste` ce qui est sélectionné. Un repli « Autres » n'a pas de
+    // code ; il sera rouvert au chargement par le poste qu'il contient.
+    if (node && node.kind === 'fn') q.set('niveau', node.code);
     if (cellule) q.set('poste', cellule);
-    else if (node && node.kind === 'fn') q.set('niveau', node.code);
     if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
     const hash = q.toString();
     const url = location.pathname + location.search + (hash ? '#' + hash : '');

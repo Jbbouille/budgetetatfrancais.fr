@@ -152,7 +152,10 @@ h1 { font-size: clamp(1.875rem, 5.5vw, 3rem); max-width: 18ch; }
   display: grid; grid-template-columns: .7rem 1fr auto auto; align-items: baseline;
   gap: .3rem .7rem; padding: .55rem .25rem; color: var(--ink);
 }
+/* .on marque aussi bien le survol que la part cliquée, qui reste en avant
+   tant que l'encart du bas la décrit. */
 .keys button:hover, .keys button.on { background: var(--hover); }
+.keys button.on { box-shadow: inset 2px 0 0 var(--ink-3); }
 .keys i { width: .7rem; height: .7rem; border-radius: 2px; align-self: center; }
 .keys .name { font-size: .875rem; }
 @media (min-width: 1100px) {

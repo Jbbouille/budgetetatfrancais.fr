@@ -124,14 +124,18 @@
     return val(node.code);
   };
 
+  let PARTS = [];
+
   function draw() {
     readColors();
     drawYear();
     const d = slices();
+    PARTS = d.parts;
     drawPie(d);
     drawKeys(d);
     drawCrumb();
     drawCellule();
+    repaint();
   }
 
   function drawYear() {
@@ -289,11 +293,18 @@
     });
   }
 
+  /* La part cliquée reste en avant, comme au survol : sans cela, l'encart du
+     bas parle d'un poste qu'on ne distingue plus dans le camembert. */
+  const actif = () => (hovered != null
+    ? hovered
+    : PARTS.findIndex((d) => d.code && d.code === cellule));
+
   function repaint() {
+    const a = actif();
     [...document.querySelectorAll('#pie path')].forEach((p, i) =>
-      p.classList.toggle('dim', hovered != null && i !== hovered));
+      p.classList.toggle('dim', a >= 0 && i !== a));
     [...document.querySelectorAll('#keys button')].forEach((b, i) =>
-      b.classList.toggle('on', hovered === i));
+      b.classList.toggle('on', i === a));
   }
 
   function open(p) {
@@ -304,6 +315,7 @@
     } else {
       cellule = cellule === p.code ? null : p.code;
       drawCellule();
+      repaint();
       return;
     }
     cellule = null;

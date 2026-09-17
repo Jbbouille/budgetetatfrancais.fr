@@ -141,14 +141,18 @@
 
   /* ---------- rendu ---------- */
 
+  let PARTS = [];
+
   function draw() {
     readColors();
     drawYear();
     const data = slices();
+    PARTS = data;
     drawPie(data);
     drawKeys(data);
     drawCrumb();
     drawCellule();
+    repaint();
   }
 
   /* ---------- sélecteur d'année ---------- */
@@ -259,8 +263,8 @@
       path.setAttribute('role', 'button');
       path.setAttribute('aria-label', `${d.label}, ${md(d.v)}, ${pct(d.share)}`);
 
-      const enter = () => { hovered = d.i; paint(); showTip(d); };
-      const leave = () => { hovered = null; paint(); tip.classList.remove('on'); };
+      const enter = () => { hovered = d.i; repaint(); showTip(d); };
+      const leave = () => { hovered = null; repaint(); tip.classList.remove('on'); };
       path.addEventListener('pointerenter', enter);
       path.addEventListener('pointerleave', leave);
       path.addEventListener('focus', enter);
@@ -281,12 +285,7 @@
     svg.append(kv, kk);
     node.appendChild(svg);
 
-    function paint() {
-      [...svg.querySelectorAll('path')].forEach((p, i) =>
-        p.classList.toggle('dim', hovered != null && i !== hovered));
-      [...document.querySelectorAll('#keys button')].forEach((b, i) =>
-        b.classList.toggle('on', hovered === i));
-    }
+    function paint() { repaint(); }
 
     function showTip(d) {
       const openable = d.rest || hasChildren(d.code);
@@ -323,11 +322,18 @@
     });
   }
 
+  /* La part cliquée reste en avant, comme au survol : sans cela, l'encart du
+     bas parle d'un poste qu'on ne distingue plus dans le camembert. */
+  const actif = () => (hovered != null
+    ? hovered
+    : PARTS.findIndex((d) => d.code && d.code === cellule));
+
   function repaint() {
+    const a = actif();
     [...document.querySelectorAll('#pie path')].forEach((p, i) =>
-      p.classList.toggle('dim', hovered != null && i !== hovered));
+      p.classList.toggle('dim', a >= 0 && i !== a));
     [...document.querySelectorAll('#keys button')].forEach((b, i) =>
-      b.classList.toggle('on', hovered === i));
+      b.classList.toggle('on', i === a));
   }
 
   function open(d) {
@@ -339,6 +345,7 @@
       // Poste terminal : plus rien à ouvrir, on montre d'où vient le chiffre.
       cellule = cellule === d.code ? null : d.code;
       drawCellule();
+      repaint();
       return;
     }
     cellule = null;

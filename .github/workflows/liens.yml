@@ -10,6 +10,7 @@ on:
       - index.html
       - debat.html
       - recettes.html
+      - faq.html
       - data/meta.json
       - data/definitions.json
       - scripts/check_links.py

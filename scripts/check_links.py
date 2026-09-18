@@ -48,7 +48,7 @@ def collect():
         urls.setdefault(defs["source"]["url"], "definitions:source")
 
     # 3. les liens reellement affiches sur les pages
-    for page in ("index.html", "debat.html", "recettes.html"):
+    for page in ("index.html", "debat.html", "recettes.html", "faq.html"):
         html = (ROOT / page).read_text(encoding="utf-8")
         for url in re.findall(r"""https://[^"'<> )]+""", html):
             urls.setdefault(url.rstrip(".,)"), page)

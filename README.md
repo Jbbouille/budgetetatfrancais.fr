@@ -142,6 +142,20 @@ nouveau millésime, qui vit à une autre adresse — voir la section suivante.
    `ratios`, et une entrée `cnAAAA` dans `sources`).
 4. Relancer `check_links.py`.
 
+## Images de partage et icônes
+
+`scripts/build_images.py` génère `og-depenses.png` et `og-recettes.png` (aperçus
+affichés quand un lien est partagé), `apple-touch-icon.png`, `favicon.ico` et
+`favicon.svg`. Les camemberts des aperçus sont calculés depuis les données :
+**relancer le script après chaque mise à jour des données**, sinon les aperçus
+montrent les chiffres de l'année précédente. Il utilise les polices de Windows
+(Georgia, Segoe UI).
+
+```bash
+pip install Pillow
+python scripts/build_images.py
+```
+
 ## Cache du navigateur
 
 Les pages chargent `assets/*.js?v=N` et `assets/style.css?v=N`. Après une

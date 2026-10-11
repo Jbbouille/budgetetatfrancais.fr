@@ -27,7 +27,16 @@
   "GF0702": "Les soins de ville : consultations de médecins, de dentistes, d'auxiliaires médicaux.",
   "GF0701": "Les médicaments, appareillages et dispositifs médicaux remboursés.",
   "GF0904": "L'enseignement supérieur : universités, grandes écoles, et la recherche qui y est rattachée.",
-  "GF0409": "Les transports : routes, ferroviaire, transports urbains, aérien et maritime — infrastructures comme subventions d'exploitation."
+  "GF0409": "Les transports : routes, ferroviaire, transports urbains, aérien et maritime — infrastructures comme subventions d'exploitation.",
+  "GF0901": "Les écoles maternelles et élémentaires : la scolarité de la petite section au CM2.",
+  "GF0902": "Les collèges et les lycées, généraux, technologiques et professionnels : la scolarité de la sixième à la terminale.",
+  "GF0906": "Ce qui entoure l'enseignement sans être de l'enseignement : restauration scolaire, transports scolaires, internats, médecine scolaire.",
+  "GF0301": "La police et la gendarmerie dans leurs missions de sécurité intérieure : prévention de la délinquance, enquêtes, circulation routière, contrôle des frontières.",
+  "GF0302": "La lutte contre les incendies et les secours aux personnes, assurés pour l'essentiel par les sapeurs-pompiers.",
+  "GF0303": "Les tribunaux judiciaires et administratifs, l'exécution des décisions de justice, la probation, ainsi que la représentation et le conseil juridiques assurés par l'État.",
+  "GF0304": "Les prisons et les autres établissements de détention ou de réinsertion des personnes condamnées.",
+  "GF0201": "Les forces armées terrestres, navales, aériennes et spatiales, avec leur renseignement, leurs équipements, leurs infrastructures et leurs réserves.",
+  "GF0202": "La préparation de la population aux crises graves : plans d'urgence, exercices, abris. Rien à voir avec les pompiers, comptés dans l'ordre et la sécurité publics, d'où un montant minime."
  },
  "liens": {
   "GF01": [
@@ -259,6 +268,96 @@
    }
   ],
   "GF0409": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0901": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0902": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0906": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0301": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0302": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0303": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0304": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0201": [
+   {
+    "label": "Nomenclature COFOG",
+    "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"
+   },
+   {
+    "label": "Insee Première n° 2093 — l'usage de l'argent public",
+    "url": "https://www.insee.fr/fr/statistiques/8735252"
+   }
+  ],
+  "GF0202": [
    {
     "label": "Nomenclature COFOG",
     "url": "https://www.insee.fr/fr/metadonnees/definition/c1064"

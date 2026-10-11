@@ -316,12 +316,19 @@
      la lecture, et toujours accompagne du lien vers la definition de reference. */
   function definition(code) {
     if (!DEFS || !code) return '';
-    const texte = DEFS.postes[code];
-    if (!texte) return '';
-    const liens = (DEFS.liens[code] || [DEFS.source])
+    // Une sous-catégorie sans définition propre reprend celle de sa catégorie
+    // parente, en le disant : sans ce repli, le dépliant disparaissait pour la
+    // plupart des sous-catégories, qui n'ont pas de définition rédigée.
+    const parent = code.length > 4 ? code.slice(0, 4) : null;
+    const source = DEFS.postes[code] ? code : (parent && DEFS.postes[parent] ? parent : null);
+    if (!source) return '';
+    const liens = (DEFS.liens[source] || [DEFS.source])
       .map((l) => `<a href="${l.url}">${l.label}</a>`).join(' · ');
-    return `<details class="def"><summary>Que recouvre ce poste&nbsp;?</summary>` +
-      `<p>${texte}</p><p class="liens">${liens}</p>` +
+    const titre = source === code
+      ? 'Que recouvre ce poste&nbsp;?'
+      : `Que recouvre la catégorie «&nbsp;${shortLabel(DATA.apu[source].label)}&nbsp;»&nbsp;?`;
+    return `<details class="def"><summary>${titre}</summary>` +
+      `<p>${DEFS.postes[source]}</p><p class="liens">${liens}</p>` +
       `<p class="src">${DEFS.source.note}</p></details>`;
   }
 

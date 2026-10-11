@@ -30,6 +30,8 @@
   };
 
   let DATA = null, stack = [], hovered = null, yi = 0, cellule = null;
+  let comparer = null;     // poste de comparaison affiché dans l'encart, ou null
+  let ENTREES = null;
 
   const last = (a) => a[a.length - 1];
   const P = (k) => DATA.postes[k];
@@ -70,6 +72,13 @@
     const parent = P(k)?.parent;
     return parent && EMOJI[parent] ? EMOJI[parent] : '\u{1F4B6}';
   }
+
+  // Vocabulaire courant pour la recherche, en plus des libellés Insee.
+  const MOTS_CLES_R = {
+    cotisations: 'charges sociales salaires securite sociale',
+    emprunt: 'dette deficit',
+    d5: 'impot revenu',
+  };
 
   const court = (s) => s
     .replace(' (besoin de financement)', '')
@@ -169,6 +178,8 @@
       if (i >= 0) yi = i;
     }
     stack = []; cellule = null;
+    comparer = q.get('comparer');
+    if (!comparer || !DATA.postes[comparer]) comparer = null;
     readColors();
 
     const niveau = q.get('niveau');
@@ -201,6 +212,8 @@
     // code ; il sera rouvert au chargement par le poste qu'il contient.
     if (node && node.kind === 'fn') q.set('niveau', node.code);
     if (cellule) q.set('poste', cellule);
+    // La comparaison n'est écrite que si l'encart qui l'affiche est visible.
+    if (comparer && (cellule || (node && node.kind === 'fn'))) q.set('comparer', comparer);
     if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
     const hash = q.toString();
     const url = location.pathname + location.search + (hash ? '#' + hash : '');
@@ -261,18 +274,23 @@
      quand le poste n'existe dans aucun fichier (c'est le cas de l'emprunt). */
   function drawCellule() {
     const el = $('#cellule');
-    const p = cellule && P(cellule);
+    // Comme sur la page des dépenses : le poste sélectionné, sinon le niveau
+    // ouvert. La provenance (cellule Excel ou soustraction) n'est donnée que
+    // pour un poste sélectionné.
+    const node = last(stack);
+    const code = cellule || (node && node.kind === 'fn' ? node.code : null);
+    const p = code && P(code);
     if (!p) { el.hidden = true; el.innerHTML = ''; return; }
     const montant = p.v[yi] ?? 0;
     const part = (montant / DATA.total.v[yi]) * 100;
-    let ou;
+    let ou = '';
 
-    if (p.calcule) {
+    if (cellule && p.calcule) {
       ou = `<span class="ou">Ce montant n'est lu dans aucun fichier&nbsp;: c'est une ` +
         `soustraction — <code>${nf(DATA.total.v[yi])}</code> de dépenses moins ` +
         `<code>${nf(DATA.recettes[yi])}</code> de recettes = ` +
         `<code>${nf(montant)}</code> Md€ à emprunter.</span>`;
-    } else {
+    } else if (cellule) {
       const s = DATA.sources[DATA.source_de[cellule]];
       const col = s.colonnes[yi - (s.decalage || 0)];
       ou = `<span class="ou"><a href="${s.url}">${s.fichier}</a> · feuille ` +
@@ -280,8 +298,16 @@
         `<code>${col}</code> · cellule <code>${col}${p.r}</code></span>`;
     }
     el.hidden = false;
-    el.innerHTML = `<span class="emo">${emo(cellule)}</span><b>${p.label}</b> — ` +
+    el.innerHTML = `<span class="emo">${emo(code)}</span><b>${p.label}</b> — ` +
       `${md(montant)} en ${year()}, soit <b>${pct(part)}</b> du total à financer${ou}`;
+    el.appendChild(blocComparaison({
+      code, cible: comparer,
+      entrees: (ENTREES ??= Object.keys(DATA.postes).filter(utile).map((c) => ({
+        code: c, label: court(P(c).label), emoji: emo(c), ancetres: ancetres(c),
+      }))),
+      valeur: (c) => P(c).v[yi] ?? 0, annee: year(),
+      surChange: (c) => { comparer = c; drawCellule(); ecrireURL(); },
+    }));
   }
 
   function drawPie(d) {
@@ -446,6 +472,20 @@
       $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       draw();
+      installerRecherche({
+        racine: $('#recherche'),
+        // Tous les postes de recettes, avec le chemin de leurs parents.
+        entrees: Object.keys(DATA.postes).filter(utile).map((c) => ({
+          code: c,
+          label: court(P(c).label),
+          chemin: ancetres(c).map((a) => court(P(a).label)).join(' › '),
+          emoji: emo(c),
+          ouvrable: enfants(c).some(utile),
+          motsCles: MOTS_CLES_R[c] || '',
+        })),
+        annee: () => (yi !== DATA.years.length - 1 ? DATA.years[yi] : null),
+        appliquer: () => { lireURL(); hovered = null; draw(); },
+      });
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
       addEventListener('hashchange', () => { lireURL(); hovered = null; draw(); });
     })

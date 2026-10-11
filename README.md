@@ -20,6 +20,16 @@ affichées en lecture seule sous forme de feuilles de calcul.
   l'adresse se met à jour au fil de la navigation. L'écriture passe par
   `replaceState` : le bouton « précédent » ramène à la page d'avant, pas à la
   part précédente.
+- **Recherche** : un champ au-dessus du curseur trouve une catégorie ou une
+  sous-catégorie, sans tenir compte des accents ni du pluriel, et avec le
+  vocabulaire courant (« retraites » trouve Vieillesse, « hôpital » les services
+  hospitaliers). Choisir un résultat écrit l'URL, que la page relit pour ouvrir
+  le bon niveau (`assets/recherche.js`).
+- **Comparaison** : un bouton de l'encart du bas compare le poste affiché à
+  n'importe quel autre (« Vieillesse représente 4,7 fois Maladie »), avec un
+  avertissement quand les deux ne sont pas au même niveau de détail ou que
+  l'un contient l'autre. La comparaison est gardée dans l'URL :
+  `#niveau=GF10&poste=GF1002&comparer=GF02` (`assets/comparer.js`).
 - **Un emoji par poste** : les sous-fonctions héritent de l'emoji de leur
   fonction parente, sauf exceptions listées dans `EMOJI` (app.js).
 - **La cellule d'origine** : cliquer sur un poste qui n'a plus de sous-niveau

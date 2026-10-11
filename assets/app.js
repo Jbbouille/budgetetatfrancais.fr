@@ -29,6 +29,13 @@
   };
 
   let DATA = null, DEFS = null;
+  let comparer = null;     // poste de comparaison affiché dans l'encart, ou null
+  let ENTREES = null;      // liste des postes pour la comparaison, calculée une fois
+
+  const entreesComparaison = () => (ENTREES ??= Object.keys(DATA.apu)
+    .filter((c) => c !== '_Z')
+    .map((c) => ({ code: c, label: shortLabel(DATA.apu[c].label), emoji: emo(c),
+                   ancetres: c.length > 4 ? [c.slice(0, 4)] : [] })));
   let stack = [];          // pile de navigation : [] = racine
   let hovered = null;
   let yi = 0;              // index de l'année affichée dans DATA.years
@@ -75,6 +82,30 @@
   };
   const emo = (code) =>
     code ? (EMOJI[code] || EMOJI[code.slice(0, 4)] || '') : EMOJI.AUTRES;
+
+  /* Vocabulaire courant absent des libellés Insee, pour la recherche. Les
+     définitions de data/definitions.json sont indexées en plus. */
+  const MOTS_CLES = {
+    GF01: 'administration parlement ministeres impots fonctionnement etat',
+    GF0107: 'interets dette emprunt',
+    GF02: 'armee militaire soldats',
+    GF03: 'police gendarmerie justice prison tribunal pompiers securite',
+    GF04: 'economie entreprises aides subventions',
+    GF0409: 'routes trains sncf transports',
+    GF05: 'ecologie environnement dechets pollution climat',
+    GF06: 'logement eau eclairage urbanisme',
+    GF07: 'sante soins medecins',
+    GF0703: 'hopital hopitaux clinique',
+    GF0701: 'medicaments pharmacie',
+    GF08: 'culture sport loisirs audiovisuel',
+    GF09: 'ecole education professeurs enseignants college lycee',
+    GF0904: 'universite etudiants fac recherche',
+    GF10: 'social aides sociales',
+    GF1002: 'retraite retraites pensions retraites seniors personnes agees',
+    GF1004: 'allocations familiales enfants creche',
+    GF1005: 'chomage pole emploi france travail',
+    GF1007: 'rsa pauvrete minima sociaux',
+  };
 
   const shortLabel = (s) => s
     .replace('Services généraux des administrations publiques', 'Services généraux')
@@ -190,6 +221,8 @@
       if (i >= 0) yi = i;
     }
     stack = []; cellule = null;
+    comparer = q.get('comparer');
+    if (!comparer || comparer === '_Z' || !DATA.apu[comparer]) comparer = null;
     readColors();
 
     const niveau = q.get('niveau');
@@ -222,6 +255,8 @@
     // code ; il sera rouvert au chargement par le poste qu'il contient.
     if (node && node.kind === 'fn') q.set('niveau', node.code);
     if (cellule) q.set('poste', cellule);
+    // La comparaison n'est écrite que si l'encart qui l'affiche est visible.
+    if (comparer && (cellule || (node && node.kind === 'fn'))) q.set('comparer', comparer);
     if (yi !== DATA.years.length - 1) q.set('annee', DATA.years[yi]);
     const hash = q.toString();
     const url = location.pathname + location.search + (hash ? '#' + hash : '');
@@ -321,6 +356,11 @@
       `<b>${p.label}</b> — ${md(montant)} en ${year()}, soit ` +
       `<b>${pct(partTotale)}</b> de la dépense publique totale` +
       ou + definition(code);
+    el.appendChild(blocComparaison({
+      code, cible: comparer, entrees: entreesComparaison(),
+      valeur: (c) => DATA.apu[c].v[yi] ?? 0, annee: year(),
+      surChange: (c) => { comparer = c; drawCellule(); ecrireURL(); },
+    }));
   }
 
   function drawPie(data) {
@@ -485,6 +525,20 @@
       $('#maj').textContent = new Date(d.genere)
         .toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       draw();
+      installerRecherche({
+        racine: $('#recherche'),
+        // Toutes les fonctions et sous-fonctions COFOG, avec leur parent.
+        entrees: Object.keys(DATA.apu).filter((c) => c !== '_Z').map((c) => ({
+          code: c,
+          label: shortLabel(DATA.apu[c].label),
+          chemin: c.length > 4 ? shortLabel(DATA.apu[c.slice(0, 4)].label) : '',
+          emoji: emo(c),
+          ouvrable: children(c).some((k) => DATA.apu[k].v.some((x) => x > 0)),
+          motsCles: `${MOTS_CLES[c] || ''} ${(DEFS && DEFS.postes[c]) || ''}`,
+        })),
+        annee: () => (yi !== DATA.years.length - 1 ? DATA.years[yi] : null),
+        appliquer: () => { lireURL(); hovered = null; draw(); },
+      });
       matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
       addEventListener('hashchange', () => { lireURL(); hovered = null; draw(); });
     })
